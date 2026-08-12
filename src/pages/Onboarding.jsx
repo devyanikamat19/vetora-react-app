@@ -1,13 +1,21 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useApp } from '../context/AppContext';
 
 const Onboarding = () => {
   const navigate = useNavigate();
+  const { login } = useApp();
   const [showPassword, setShowPassword] = useState(false);
   const [form, setForm] = useState({ fullName: '', email: '', password: '' });
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    login({
+      name: form.fullName || 'Vetora Student',
+      email: form.email || 'student@vetora.edu',
+      initials: (form.fullName || 'V S').split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase(),
+      avatar: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDPQmBGn01KnqkuSPySbhOH37sR7r2GkTNO8u81tUNaxyl2Y3riAnRfRe8RsP5MY12ZIgd2iwjaaU3m7zYwJ01s5DYSNKuUjUD-uOsLaHpX1VlyyJAa_nphvtqJiwdHIMOE-s68o4dKSD6yNL47zwR7Nafn34Yoi0EOzztMtnt8p1xFsv5qp3ev46qIIDh-FPk3CcOkGIpYsIh2vtu0qWCpJGfL9xb0ac4ym89pyKJ7caQwTDMKxkF4'
+    });
     navigate('/dashboard');
   };
 

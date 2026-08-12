@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useApp } from '../context/AppContext';
+import Sidebar from '../components/Sidebar';
 
 const labData = {
   cbc: [
@@ -25,6 +27,7 @@ const tabs = ['Physical Exam', 'Bloodwork Results', 'X-Ray', 'Ultrasound', 'Urin
 
 const Clinical = () => {
   const [activeTab, setActiveTab] = useState('Bloodwork Results');
+  const { showToast } = useApp();
 
   return (
     <div className="bg-background text-on-background font-sans antialiased min-h-screen flex flex-col">
@@ -49,53 +52,8 @@ const Clinical = () => {
       </nav>
 
       <div className="flex flex-1 overflow-hidden">
-        {/* Side Navigation */}
-        <aside className="hidden md:flex bg-surface-container-low flex-col h-full w-64 shadow-sm p-4 space-y-2 z-30 shrink-0">
-          <div className="mb-6 px-2 pt-4">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center font-bold text-lg">VS</div>
-              <div>
-                <h2 className="font-display text-sm font-bold text-primary leading-tight">Vetora Student</h2>
-                <p className="font-sans text-xs text-on-surface-variant">Clinical Excellence</p>
-              </div>
-            </div>
-          </div>
-          <nav className="flex-1 space-y-1">
-            {[
-              { icon: 'home', label: 'Home', to: '/dashboard', active: false },
-              { icon: 'explore', label: 'Explore', to: '/explore', active: false },
-              { icon: 'school', label: 'My Learning', to: '/dashboard', active: false },
-              { icon: 'medical_services', label: 'Clinical Cases', to: '/clinical', active: true },
-              { icon: 'smart_toy', label: 'Vetora AI', to: '/dashboard', active: false },
-              { icon: 'verified', label: 'Certificates', to: '/dashboard', active: false },
-              { icon: 'person', label: 'Profile', to: '/dashboard', active: false },
-            ].map(({ icon, label, to, active }) => (
-              <Link
-                key={label}
-                to={to}
-                className={`flex items-center gap-3 px-3 py-2 rounded-lg transition-colors font-sans text-sm ${
-                  active
-                    ? 'bg-secondary-container text-on-secondary-container font-bold'
-                    : 'text-on-surface-variant hover:bg-surface-variant'
-                }`}
-              >
-                <span className="material-symbols-outlined" style={active ? { fontVariationSettings: "'FILL' 1" } : {}}>{icon}</span>
-                <span>{label}</span>
-              </Link>
-            ))}
-          </nav>
-          <div className="mt-auto pt-4 border-t border-outline-variant/30">
-            <button className="w-full bg-primary-container text-on-primary-container py-2 rounded-lg font-sans text-sm hover:bg-primary hover:text-on-primary transition-colors shadow-sm">Upgrade to Pro</button>
-            <div className="flex gap-2 mt-2">
-              <a className="flex-1 flex items-center justify-center gap-2 px-3 py-2 text-on-surface-variant hover:bg-surface-variant rounded-lg transition-colors font-sans text-xs" href="#">
-                <span className="material-symbols-outlined text-[18px]">help</span> Support
-              </a>
-              <Link to="/login" className="flex-1 flex items-center justify-center gap-2 px-3 py-2 text-on-surface-variant hover:bg-surface-variant rounded-lg transition-colors font-sans text-xs">
-                <span className="material-symbols-outlined text-[18px]">logout</span> Logout
-              </Link>
-            </div>
-          </div>
-        </aside>
+        {/* Shared Sidebar */}
+        <Sidebar />
 
         {/* Main Content Area */}
         <main className="flex-1 flex flex-col md:flex-row overflow-hidden bg-surface-container-lowest">
@@ -133,7 +91,7 @@ const Clinical = () => {
               <div className="bg-surface/90 border border-outline-variant shadow-sm rounded-xl overflow-hidden transition-all duration-300 hover:shadow-md hover:border-primary-container/30 p-4">
                 <h3 className="font-sans text-sm text-primary font-bold mb-2 flex items-center justify-between">
                   <span className="flex items-center gap-2"><span className="material-symbols-outlined text-[18px]">medical_information</span> Clinical Notes</span>
-                  <button className="text-primary hover:text-primary-container"><span className="material-symbols-outlined text-[18px]">edit_note</span></button>
+                  <button onClick={() => showToast('Note editing coming soon.', 'info')} className="text-primary hover:text-primary-container"><span className="material-symbols-outlined text-[18px]">edit_note</span></button>
                 </h3>
                 <div className="space-y-2">
                   <div className="p-2 font-sans text-sm text-on-surface-variant bg-surface-container-low rounded border border-outline-variant/50">
@@ -277,11 +235,17 @@ const Clinical = () => {
 
             {/* Floating Action Area */}
             <div className="absolute bottom-6 right-6 flex gap-4">
-              <button className="bg-surface/95 border border-outline-variant px-6 py-3 rounded-xl font-sans font-bold text-primary flex items-center gap-2 hover:bg-surface transition-colors shadow-md backdrop-blur-md">
+              <button
+                onClick={() => showToast('Vetora AI is a premium feature. Upgrade to Pro to unlock!', 'info')}
+                className="bg-surface/95 border border-outline-variant px-6 py-3 rounded-xl font-sans font-bold text-primary flex items-center gap-2 hover:bg-surface transition-colors shadow-md backdrop-blur-md"
+              >
                 <span className="material-symbols-outlined text-[20px] text-tertiary">smart_toy</span>
                 Ask Vetora AI
               </button>
-              <button className="bg-primary text-on-primary px-8 py-3 rounded-lg font-sans font-bold shadow-md hover:bg-primary-container hover:text-on-primary-container transition-all hover:shadow-lg active:scale-95">
+              <button
+                onClick={() => showToast('Diagnosis submitted for review! 🎉', 'success')}
+                className="bg-primary text-on-primary px-8 py-3 rounded-lg font-sans font-bold shadow-md hover:bg-primary-container hover:text-on-primary-container transition-all hover:shadow-lg active:scale-95"
+              >
                 Proceed to Diagnosis
               </button>
             </div>
