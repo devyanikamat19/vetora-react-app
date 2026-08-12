@@ -23,10 +23,21 @@ const BADGE_STYLES = {
   'Completed': 'bg-[#0d5c63] text-white',
 };
 
-// ─── Course Creator Component (Image 4 exact implementation) ────────────────────
+// ─── Course Creator Component ──────────────────────────────────────────────────
 const CourseCreator = ({ showToast, onBack }) => {
-  const [activeStep, setActiveStep] = useState(2); // Step 2: Curriculum by default matching Image 4
+  const [activeStep, setActiveStep] = useState(2); // Step 2: Curriculum by default
   const [expandedModules, setExpandedModules] = useState({ m1: true, m2: false });
+  const [videoModalModuleId, setVideoModalModuleId] = useState(null);
+  const [resourceModalModuleId, setResourceModalModuleId] = useState(null);
+
+  // Simulated upload state inside modals
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [isUploading, setIsUploading] = useState(false);
+  const [videoTitle, setVideoTitle] = useState('');
+  const [videoDuration, setVideoDuration] = useState('14:30');
+  const [resourceTitle, setResourceTitle] = useState('');
+  const [resourceType, setResourceType] = useState('PDF Reference');
+
   const [modules, setModules] = useState([
     {
       id: 'm1',
@@ -35,17 +46,20 @@ const CourseCreator = ({ showToast, onBack }) => {
       lessonCount: 3,
       assessmentCount: 1,
       lessons: [
-        { id: 'l1', type: 'video', title: '1.1 Introduction to Small Animal Anatomy', meta: 'Video • 12:45' },
-        { id: 'l2', type: 'reading', title: '1.2 Basic Handling and Restraint Techniques', meta: 'Reading • 15 min' },
+        { id: 'l1', type: 'video', title: '1.1 Introduction to Small Animal Anatomy', meta: 'Video • 12:45 • HD 1080p' },
+        { id: 'l2', type: 'resource', title: '1.2 Thoracic Radiography Reference Atlas', meta: 'Resource • PDF • 14.8 MB' },
+        { id: 'l3', type: 'reading', title: '1.3 Basic Handling and Restraint Techniques', meta: 'Reading • 15 min' },
       ]
     },
     {
       id: 'm2',
       code: 'M2',
       title: 'Module 2: Diagnostics and Imaging',
-      lessonCount: 0,
+      lessonCount: 1,
       assessmentCount: 0,
-      lessons: []
+      lessons: [
+        { id: 'l4', type: 'resource', title: '2.1 Electrocardiogram (ECG) Interpretation Guide', meta: 'Resource • PDF • 8.2 MB' }
+      ]
     }
   ]);
 
@@ -70,22 +84,74 @@ const CourseCreator = ({ showToast, onBack }) => {
     showToast('New module added to curriculum.', 'success');
   };
 
-  const handleAddLesson = (moduleId) => {
+  // Handle Video Upload Simulation
+  const handleSaveVideo = (moduleId) => {
+    if (!videoTitle.trim()) {
+      showToast('Please enter a title for the video lesson.', 'info');
+      return;
+    }
+
+    setIsUploading(true);
+    setUploadProgress(35);
+
+    setTimeout(() => setUploadProgress(70), 400);
+    setTimeout(() => {
+      setUploadProgress(100);
+      setModules(prev => prev.map(m => {
+        if (m.id === moduleId) {
+          const nextNum = m.lessons.length + 1;
+          return {
+            ...m,
+            lessonCount: m.lessonCount + 1,
+            lessons: [
+              ...m.lessons,
+              {
+                id: `v_${Date.now()}`,
+                type: 'video',
+                title: `${m.code}.${nextNum} ${videoTitle}`,
+                meta: `Video • ${videoDuration || '15:00'} • HD 1080p`
+              }
+            ]
+          };
+        }
+        return m;
+      }));
+      setIsUploading(false);
+      setVideoModalModuleId(null);
+      setVideoTitle('');
+      setUploadProgress(0);
+      showToast(`Video "${videoTitle}" uploaded and attached to ${moduleId.toUpperCase()}!`, 'success');
+    }, 900);
+  };
+
+  // Handle Resource Upload Simulation
+  const handleSaveResource = (moduleId) => {
+    if (!resourceTitle.trim()) {
+      showToast('Please enter a title for the resource.', 'info');
+      return;
+    }
+
     setModules(prev => prev.map(m => {
       if (m.id === moduleId) {
-        const nextNum = m.lessons.length + 1;
         return {
           ...m,
-          lessonCount: m.lessonCount + 1,
           lessons: [
             ...m.lessons,
-            { id: `l_${Date.now()}`, type: 'video', title: `${m.code}.${nextNum} Physical Diagnostics Practice`, meta: 'Video • 10:00' }
+            {
+              id: `r_${Date.now()}`,
+              type: 'resource',
+              title: resourceTitle,
+              meta: `Resource • ${resourceType} • 6.4 MB`
+            }
           ]
         };
       }
       return m;
     }));
-    showToast('Lesson added to module.', 'success');
+
+    setResourceModalModuleId(null);
+    setResourceTitle('');
+    showToast(`Resource "${resourceTitle}" attached successfully!`, 'success');
   };
 
   const handleAddQuiz = (moduleId) => {
@@ -96,7 +162,7 @@ const CourseCreator = ({ showToast, onBack }) => {
           assessmentCount: m.assessmentCount + 1,
           lessons: [
             ...m.lessons,
-            { id: `q_${Date.now()}`, type: 'quiz', title: `Module Quiz: Knowledge Check`, meta: 'Quiz • 10 Questions' }
+            { id: `q_${Date.now()}`, type: 'quiz', title: `Module Quiz: Clinical Knowledge Check`, meta: 'Quiz • 10 Questions' }
           ]
         };
       }
@@ -108,44 +174,43 @@ const CourseCreator = ({ showToast, onBack }) => {
   const steps = [
     { num: 1, label: 'Information' },
     { num: 2, label: 'Curriculum' },
-    { num: 3, label: 'Lessons' },
-    { num: 4, label: 'Assessments' },
-    { num: 5, label: 'Review' },
+    { num: 3, label: 'Upload Videos' },
+    { num: 4, label: 'Upload Resources' },
+    { num: 5, label: 'Review & Publish' },
   ];
 
   return (
     <div className="bg-[#f4f7f6] min-h-screen p-4 md:p-8">
-      {/* Top Action Header Bar (Image 4) */}
+      {/* Top Action Header Bar */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 pb-4 border-b border-gray-200">
         <div>
           <span className="font-sans text-[11px] font-bold text-[#0d5c63] tracking-widest uppercase">COURSE CREATOR</span>
-          <h1 className="font-display text-2xl md:text-3xl font-bold text-[#0e2a2a] mt-0.5">Small Animal Medicine</h1>
+          <h1 className="font-display text-2xl md:text-3xl font-bold text-[#0e2a2a] mt-0.5">Small Animal Clinical Medicine</h1>
         </div>
 
         <div className="flex items-center gap-3">
           <button
-            onClick={() => showToast('Preview mode launched.', 'info')}
+            onClick={() => showToast('Course preview opened.', 'info')}
             className="px-5 py-2 rounded-full border border-gray-300 bg-white text-gray-700 font-sans text-sm font-semibold hover:bg-gray-50 transition-colors shadow-2xs"
           >
             Preview
           </button>
           <button
             onClick={() => {
-              showToast('Course published successfully!', 'success');
+              showToast('Course published with all uploaded videos & resources!', 'success');
               if (onBack) onBack();
             }}
             className="px-6 py-2 rounded-full bg-[#0d5c63] hover:bg-[#09474d] text-white font-sans text-sm font-semibold transition-all shadow-xs flex items-center gap-2"
           >
             <span className="material-symbols-outlined text-[18px]">publish</span>
-            Publish
+            Publish Course
           </button>
         </div>
       </div>
 
-      {/* 5-Step Stepper Bar (Image 4) */}
+      {/* 5-Step Stepper Bar */}
       <div className="max-w-3xl mx-auto mb-10">
         <div className="flex items-center justify-between relative">
-          {/* Connector Line */}
           <div className="absolute left-8 right-8 top-4 h-0.5 bg-gray-200 z-0"></div>
           
           {steps.map((step) => {
@@ -182,12 +247,12 @@ const CourseCreator = ({ showToast, onBack }) => {
         </div>
       </div>
 
-      {/* Curriculum Structure Main Section (Image 4) */}
+      {/* Curriculum Structure & Media Uploaders */}
       <div className="max-w-4xl mx-auto">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
           <div>
-            <h2 className="font-display text-lg font-bold text-gray-900">Curriculum Structure</h2>
-            <p className="font-sans text-xs text-gray-500 mt-0.5">Organize modules and lessons via drag-and-drop.</p>
+            <h2 className="font-display text-lg font-bold text-gray-900">Curriculum & Media Assets</h2>
+            <p className="font-sans text-xs text-gray-500 mt-0.5">Upload lecture videos (.mp4), PDF reading materials, and quizzes for each module.</p>
           </div>
           <button
             onClick={handleAddModule}
@@ -217,7 +282,7 @@ const CourseCreator = ({ showToast, onBack }) => {
                     <div>
                       <h3 className="font-sans text-sm font-bold text-gray-900">{m.title}</h3>
                       <p className="font-sans text-[11px] text-gray-400 font-medium">
-                        {m.lessonCount} Lessons • {m.assessmentCount} Assessment
+                        {m.lessons.length} Content Items ({m.lessons.filter(l => l.type === 'video').length} Videos, {m.lessons.filter(l => l.type === 'resource').length} Resources)
                       </p>
                     </div>
                   </div>
@@ -227,48 +292,68 @@ const CourseCreator = ({ showToast, onBack }) => {
                   </span>
                 </div>
 
-                {/* Module Lessons List (Expanded Content) */}
+                {/* Module Items List */}
                 {isExpanded && (
                   <div className="px-4 pb-4 pt-1 border-t border-gray-100 bg-gray-50/40 space-y-2">
-                    {m.lessons.map((lesson) => (
-                      <div
-                        key={lesson.id}
-                        className="bg-white p-3 rounded-xl border border-gray-200/70 shadow-2xs flex items-center justify-between hover:border-gray-300 transition-colors"
-                      >
-                        <div className="flex items-center gap-3">
-                          <span className="material-symbols-outlined text-gray-300 text-[18px]">drag_indicator</span>
-                          
-                          <div className="w-7 h-7 rounded-full bg-cyan-50 text-cyan-800 flex items-center justify-center shrink-0">
-                            <span className="material-symbols-outlined text-[16px]">
-                              {lesson.type === 'video' ? 'play_circle' : lesson.type === 'quiz' ? 'quiz' : 'menu_book'}
-                            </span>
-                          </div>
-
-                          <div>
-                            <h4 className="font-sans text-xs font-bold text-gray-900">{lesson.title}</h4>
-                            <p className="font-sans text-[11px] text-gray-400">{lesson.meta}</p>
-                          </div>
-                        </div>
-
-                        <button onClick={() => showToast('Lesson options opened.', 'info')} className="text-gray-400 hover:text-gray-600 p-1">
-                          <span className="material-symbols-outlined text-[18px]">more_vert</span>
-                        </button>
+                    {m.lessons.length === 0 ? (
+                      <div className="p-6 text-center text-gray-400 font-sans text-xs border border-dashed border-gray-200 rounded-xl my-2">
+                        No videos or resources added yet. Use the buttons below to upload content.
                       </div>
-                    ))}
+                    ) : (
+                      m.lessons.map((lesson) => (
+                        <div
+                          key={lesson.id}
+                          className="bg-white p-3 rounded-xl border border-gray-200/70 shadow-2xs flex items-center justify-between hover:border-gray-300 transition-colors"
+                        >
+                          <div className="flex items-center gap-3">
+                            <span className="material-symbols-outlined text-gray-300 text-[18px]">drag_indicator</span>
+                            
+                            <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${
+                              lesson.type === 'video' ? 'bg-teal-100 text-[#0d5c63]' : lesson.type === 'resource' ? 'bg-amber-100 text-amber-800' : 'bg-cyan-100 text-cyan-800'
+                            }`}>
+                              <span className="material-symbols-outlined text-[16px]">
+                                {lesson.type === 'video' ? 'movie' : lesson.type === 'resource' ? 'attachment' : lesson.type === 'quiz' ? 'quiz' : 'menu_book'}
+                              </span>
+                            </div>
 
-                    {/* Inline Module Footer Actions */}
-                    <div className="flex items-center gap-4 pt-3 px-2">
+                            <div>
+                              <h4 className="font-sans text-xs font-bold text-gray-900">{lesson.title}</h4>
+                              <p className="font-sans text-[11px] text-gray-400">{lesson.meta}</p>
+                            </div>
+                          </div>
+
+                          <button onClick={() => showToast(`Options for ${lesson.title} opened.`, 'info')} className="text-gray-400 hover:text-gray-600 p-1">
+                            <span className="material-symbols-outlined text-[18px]">more_vert</span>
+                          </button>
+                        </div>
+                      ))
+                    )}
+
+                    {/* Action Bar inside each module */}
+                    <div className="flex flex-wrap items-center gap-3 pt-3 px-2 border-t border-gray-200/50 mt-2">
                       <button
-                        onClick={() => handleAddLesson(m.id)}
-                        className="text-[#0d5c63] font-sans text-xs font-bold hover:underline flex items-center gap-1"
+                        onClick={() => {
+                          setVideoModalModuleId(m.id);
+                          setVideoTitle(`${m.code}.${m.lessons.length + 1} Lecture Video`);
+                        }}
+                        className="px-3 py-1.5 rounded-xl bg-[#0d5c63] text-white font-sans text-xs font-bold hover:bg-[#09474d] transition-all flex items-center gap-1.5 shadow-2xs"
                       >
-                        <span className="material-symbols-outlined text-[16px]">add</span> Add Lesson
+                        <span className="material-symbols-outlined text-[16px]">cloud_upload</span> Upload Video
+                      </button>
+                      <button
+                        onClick={() => {
+                          setResourceModalModuleId(m.id);
+                          setResourceTitle(`${m.code} Clinical Protocol & Reference Guide`);
+                        }}
+                        className="px-3 py-1.5 rounded-xl bg-amber-600 text-white font-sans text-xs font-bold hover:bg-amber-700 transition-all flex items-center gap-1.5 shadow-2xs"
+                      >
+                        <span className="material-symbols-outlined text-[16px]">note_add</span> Attach Resource (PDF)
                       </button>
                       <button
                         onClick={() => handleAddQuiz(m.id)}
-                        className="text-[#0d5c63] font-sans text-xs font-bold hover:underline flex items-center gap-1"
+                        className="px-3 py-1.5 rounded-xl border border-gray-300 text-gray-700 font-sans text-xs font-bold hover:bg-gray-100 transition-all flex items-center gap-1.5"
                       >
-                        <span className="material-symbols-outlined text-[16px]">add</span> Add Quiz
+                        <span className="material-symbols-outlined text-[16px]">quiz</span> Add Quiz
                       </button>
                     </div>
                   </div>
@@ -278,6 +363,161 @@ const CourseCreator = ({ showToast, onBack }) => {
           })}
         </div>
       </div>
+
+      {/* 🎬 MODAL: Upload Video Lecture */}
+      {videoModalModuleId && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl max-w-lg w-full p-6 md:p-8 shadow-2xl relative border border-gray-200 space-y-5">
+            <div className="flex justify-between items-center border-b border-gray-100 pb-3">
+              <div className="flex items-center gap-2">
+                <span className="material-symbols-outlined text-[#0d5c63] text-[24px]">movie</span>
+                <h3 className="font-display text-lg font-bold text-gray-900">Upload Video Lecture</h3>
+              </div>
+              <button onClick={() => setVideoModalModuleId(null)} className="text-gray-400 hover:text-gray-600">
+                <span className="material-symbols-outlined text-[20px]">close</span>
+              </button>
+            </div>
+
+            {/* Drag & Drop File Zone */}
+            <div className="border-2 border-dashed border-[#0d5c63]/40 bg-[#0d5c63]/5 hover:bg-[#0d5c63]/10 rounded-2xl p-6 text-center cursor-pointer transition-all">
+              <div className="w-12 h-12 rounded-full bg-[#0d5c63] text-white flex items-center justify-center mx-auto mb-2 shadow-xs">
+                <span className="material-symbols-outlined text-[24px]">cloud_upload</span>
+              </div>
+              <p className="font-sans text-xs font-bold text-gray-900">Drag & Drop MP4 Video File here</p>
+              <p className="font-sans text-[11px] text-gray-500 mt-0.5">Supports .mp4, .mov, .mkv up to 2 GB (HD 1080p / 4K)</p>
+            </div>
+
+            {/* Form Fields */}
+            <div className="space-y-3 font-sans text-xs">
+              <div>
+                <label className="block font-bold text-gray-700 mb-1">Lesson Title</label>
+                <input
+                  type="text"
+                  value={videoTitle}
+                  onChange={e => setVideoTitle(e.target.value)}
+                  className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-[#0d5c63] font-sans text-xs"
+                  placeholder="e.g. 1.3 Ultrasound Diagnostic Techniques"
+                />
+              </div>
+
+              <div>
+                <label className="block font-bold text-gray-700 mb-1">Lecture Duration (mm:ss)</label>
+                <input
+                  type="text"
+                  value={videoDuration}
+                  onChange={e => setVideoDuration(e.target.value)}
+                  className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-[#0d5c63] font-sans text-xs"
+                />
+              </div>
+            </div>
+
+            {/* Progress Bar (Visible during simulated upload) */}
+            {isUploading && (
+              <div className="space-y-1.5 pt-2">
+                <div className="flex justify-between font-sans text-xs font-bold">
+                  <span className="text-[#0d5c63]">Uploading & Encoding Video...</span>
+                  <span className="text-gray-900">{uploadProgress}%</span>
+                </div>
+                <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
+                  <div className="h-full bg-[#0d5c63] rounded-full transition-all duration-300" style={{ width: `${uploadProgress}%` }}></div>
+                </div>
+                <span className="font-sans text-[10px] text-gray-400 block text-right">Transcoding 1080p • 18.4 MB/s</span>
+              </div>
+            )}
+
+            {/* Buttons */}
+            <div className="flex gap-3 pt-2">
+              <button
+                type="button"
+                onClick={() => setVideoModalModuleId(null)}
+                className="w-1/3 py-2.5 rounded-xl border border-gray-300 font-sans text-xs font-bold text-gray-700 hover:bg-gray-50"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                disabled={isUploading}
+                onClick={() => handleSaveVideo(videoModalModuleId)}
+                className="w-2/3 py-2.5 rounded-xl bg-[#0d5c63] hover:bg-[#09474d] text-white font-sans text-xs font-bold shadow-xs transition-all flex items-center justify-center gap-1.5"
+              >
+                <span className="material-symbols-outlined text-[16px]">save</span> Save & Attach Video
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 📁 MODAL: Upload Supplementary Resource (PDF) */}
+      {resourceModalModuleId && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl max-w-lg w-full p-6 md:p-8 shadow-2xl relative border border-gray-200 space-y-5">
+            <div className="flex justify-between items-center border-b border-gray-100 pb-3">
+              <div className="flex items-center gap-2">
+                <span className="material-symbols-outlined text-amber-600 text-[24px]">attachment</span>
+                <h3 className="font-display text-lg font-bold text-gray-900">Attach Resource / Document</h3>
+              </div>
+              <button onClick={() => setResourceModalModuleId(null)} className="text-gray-400 hover:text-gray-600">
+                <span className="material-symbols-outlined text-[20px]">close</span>
+              </button>
+            </div>
+
+            {/* Drag & Drop File Zone */}
+            <div className="border-2 border-dashed border-amber-500/40 bg-amber-50/50 hover:bg-amber-100/50 rounded-2xl p-6 text-center cursor-pointer transition-all">
+              <div className="w-12 h-12 rounded-full bg-amber-600 text-white flex items-center justify-center mx-auto mb-2 shadow-xs">
+                <span className="material-symbols-outlined text-[24px]">upload_file</span>
+              </div>
+              <p className="font-sans text-xs font-bold text-gray-900">Drag & Drop PDF or Document here</p>
+              <p className="font-sans text-[11px] text-gray-500 mt-0.5">Supports .pdf, .docx, .pptx, .zip up to 100 MB</p>
+            </div>
+
+            {/* Form Fields */}
+            <div className="space-y-3 font-sans text-xs">
+              <div>
+                <label className="block font-bold text-gray-700 mb-1">Resource Title</label>
+                <input
+                  type="text"
+                  value={resourceTitle}
+                  onChange={e => setResourceTitle(e.target.value)}
+                  className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-[#0d5c63] font-sans text-xs"
+                  placeholder="e.g. Thoracic Radiography Reference Atlas 2026.pdf"
+                />
+              </div>
+
+              <div>
+                <label className="block font-bold text-gray-700 mb-1">Resource Category</label>
+                <select
+                  value={resourceType}
+                  onChange={e => setResourceType(e.target.value)}
+                  className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-[#0d5c63] font-sans text-xs font-bold text-gray-800"
+                >
+                  <option>PDF Reference Guide</option>
+                  <option>Clinical Lab Protocol</option>
+                  <option>Lecture Slide Deck (PPTX)</option>
+                  <option>Reading Notes</option>
+                </select>
+              </div>
+            </div>
+
+            {/* Buttons */}
+            <div className="flex gap-3 pt-2">
+              <button
+                type="button"
+                onClick={() => setResourceModalModuleId(null)}
+                className="w-1/3 py-2.5 rounded-xl border border-gray-300 font-sans text-xs font-bold text-gray-700 hover:bg-gray-50"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={() => handleSaveResource(resourceModalModuleId)}
+                className="w-2/3 py-2.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-sans text-xs font-bold shadow-xs transition-all flex items-center justify-center gap-1.5"
+              >
+                <span className="material-symbols-outlined text-[16px]">save</span> Attach Resource
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
@@ -477,7 +717,26 @@ const OverviewTab = ({ showToast }) => {
 
 const CoursesTab = ({ courses, showToast, onEditCourse }) => {
   const [search, setSearch] = useState('');
+  const [showNewCourseModal, setShowNewCourseModal] = useState(false);
+  const [newCourseTitle, setNewCourseTitle] = useState('');
+  const [newCourseCategory, setNewCourseCategory] = useState('Small Animal Surgery');
+  const [newCourseInstructor, setNewCourseInstructor] = useState('Dr. Sarah Jenkins, DVM, DACVIM');
+  const [videoFileName, setVideoFileName] = useState(null);
+  const [resourceFileName, setResourceFileName] = useState(null);
+
   const filtered = courses.filter(c => c.title.toLowerCase().includes(search.toLowerCase()));
+
+  const handleCreateCourse = (e) => {
+    e.preventDefault();
+    if (!newCourseTitle.trim()) {
+      showToast('Please enter a course title.', 'info');
+      return;
+    }
+
+    showToast(`New Course "${newCourseTitle}" created with attached media! Launching Curriculum Editor...`, 'success');
+    setShowNewCourseModal(false);
+    onEditCourse();
+  };
 
   return (
     <div className="bg-white rounded-2xl border border-gray-200/80 shadow-xs overflow-hidden">
@@ -494,13 +753,14 @@ const CoursesTab = ({ courses, showToast, onEditCourse }) => {
             />
           </div>
           <button
-            onClick={onEditCourse}
-            className="px-4 py-2 bg-[#0d5c63] text-white rounded-xl font-sans text-sm font-bold hover:bg-[#09474d] transition-colors flex items-center gap-1 shrink-0 shadow-2xs"
+            onClick={() => setShowNewCourseModal(true)}
+            className="px-4 py-2 bg-[#0d5c63] text-white rounded-xl font-sans text-sm font-bold hover:bg-[#09474d] transition-colors flex items-center gap-1 shrink-0 shadow-2xs cursor-pointer"
           >
             <span className="material-symbols-outlined text-[18px]">add</span> New Course
           </button>
         </div>
       </div>
+
       <div className="overflow-x-auto">
         <table className="w-full font-sans text-sm text-left">
           <thead>
@@ -549,6 +809,125 @@ const CoursesTab = ({ courses, showToast, onEditCourse }) => {
           </tbody>
         </table>
       </div>
+
+      {/* 🌟 NEW COURSE & MEDIA UPLOAD MODAL */}
+      {showNewCourseModal && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl max-w-xl w-full p-6 md:p-8 shadow-2xl relative border border-gray-200 space-y-6 max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-center border-b border-gray-100 pb-3">
+              <div>
+                <h3 className="font-display text-xl font-bold text-gray-900">Create New Course</h3>
+                <p className="font-sans text-xs text-gray-500 mt-0.5">Upload main lecture videos and supplementary course materials.</p>
+              </div>
+              <button onClick={() => setShowNewCourseModal(false)} className="text-gray-400 hover:text-gray-600">
+                <span className="material-symbols-outlined text-[20px]">close</span>
+              </button>
+            </div>
+
+            <form onSubmit={handleCreateCourse} className="space-y-4 font-sans text-xs">
+              <div>
+                <label className="block font-bold text-gray-700 mb-1">Course Title</label>
+                <input
+                  type="text"
+                  required
+                  value={newCourseTitle}
+                  onChange={e => setNewCourseTitle(e.target.value)}
+                  placeholder="e.g. Feline Abdominal Ultrasonography & Biopsy Techniques"
+                  className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-[#0d5c63] font-sans text-xs text-gray-900"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block font-bold text-gray-700 mb-1">Specialty Category</label>
+                  <select
+                    value={newCourseCategory}
+                    onChange={e => setNewCourseCategory(e.target.value)}
+                    className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-[#0d5c63] font-sans text-xs font-bold text-gray-800"
+                  >
+                    <option>Small Animal Surgery</option>
+                    <option>Cardiology</option>
+                    <option>Radiology & Imaging</option>
+                    <option>Equine Medicine</option>
+                    <option>Exotics & Avian</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block font-bold text-gray-700 mb-1">Lead Instructor</label>
+                  <input
+                    type="text"
+                    value={newCourseInstructor}
+                    onChange={e => setNewCourseInstructor(e.target.value)}
+                    className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-[#0d5c63] font-sans text-xs text-gray-900"
+                  />
+                </div>
+              </div>
+
+              {/* 🎬 Section 1: Upload Lecture Video */}
+              <div className="pt-2">
+                <label className="block font-bold text-gray-800 mb-1 flex items-center justify-between">
+                  <span className="flex items-center gap-1.5"><span className="material-symbols-outlined text-[#0d5c63] text-[18px]">movie</span> Upload Lecture Video (MP4)</span>
+                  <span className="text-[10px] text-gray-400">Max 2 GB</span>
+                </label>
+
+                <div
+                  onClick={() => {
+                    setVideoFileName('Lecture_01_Diagnostic_Ultrasonography_HD.mp4 (450 MB)');
+                    showToast('Video file selected for upload.', 'info');
+                  }}
+                  className="border-2 border-dashed border-[#0d5c63]/40 bg-[#0d5c63]/5 hover:bg-[#0d5c63]/10 rounded-2xl p-4 text-center cursor-pointer transition-all"
+                >
+                  <span className="material-symbols-outlined text-[24px] text-[#0d5c63]">cloud_upload</span>
+                  <p className="font-bold text-gray-800 mt-1">
+                    {videoFileName ? videoFileName : 'Click to Select or Drag & Drop MP4 Video File'}
+                  </p>
+                  <p className="text-[10px] text-gray-400 mt-0.5">Supports MP4, MOV, MKV • Auto-transcoded to 1080p</p>
+                </div>
+              </div>
+
+              {/* 📁 Section 2: Upload Course Resources (PDF / Reading Material) */}
+              <div className="pt-2">
+                <label className="block font-bold text-gray-800 mb-1 flex items-center justify-between">
+                  <span className="flex items-center gap-1.5"><span className="material-symbols-outlined text-amber-600 text-[18px]">attachment</span> Attach Course Resources & Protocols</span>
+                  <span className="text-[10px] text-gray-400">PDF, DOCX, PPTX</span>
+                </label>
+
+                <div
+                  onClick={() => {
+                    setResourceFileName('Clinical_Ultrasonography_Reference_Atlas_2026.pdf (14.2 MB)');
+                    showToast('Resource PDF attached.', 'info');
+                  }}
+                  className="border-2 border-dashed border-amber-500/40 bg-amber-50/40 hover:bg-amber-100/40 rounded-2xl p-4 text-center cursor-pointer transition-all"
+                >
+                  <span className="material-symbols-outlined text-[24px] text-amber-600">upload_file</span>
+                  <p className="font-bold text-gray-800 mt-1">
+                    {resourceFileName ? resourceFileName : 'Click to Attach Course Syllabus / PDF Materials'}
+                  </p>
+                  <p className="text-[10px] text-gray-400 mt-0.5">Supports PDF Atlases, Lab Protocol Docs, Slide Decks</p>
+                </div>
+              </div>
+
+              {/* Actions */}
+              <div className="flex gap-3 pt-4 border-t border-gray-100">
+                <button
+                  type="button"
+                  onClick={() => setShowNewCourseModal(false)}
+                  className="w-1/3 py-2.5 rounded-xl border border-gray-300 font-bold text-gray-700 hover:bg-gray-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="w-2/3 py-2.5 rounded-xl bg-[#0d5c63] hover:bg-[#09474d] text-white font-bold shadow-xs transition-all flex items-center justify-center gap-1.5"
+                >
+                  Save & Edit Curriculum <span className="material-symbols-outlined text-[16px]">arrow_forward</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
