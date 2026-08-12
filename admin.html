@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Vetora Admin Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "on-secondary-fixed-variant": "#005228",
+                      "primary-container": "#0d5c63",
+                      "tertiary-fixed-dim": "#c3c7c7",
+                      "on-primary-container": "#90d2da",
+                      "background": "#f9f9fc",
+                      "error-container": "#ffdad6",
+                      "on-surface-variant": "#3f484a",
+                      "on-tertiary-container": "#c4c8c8",
+                      "surface-dim": "#dadadc",
+                      "secondary-fixed": "#8ef9ab",
+                      "tertiary-fixed": "#dfe3e3",
+                      "on-secondary": "#ffffff",
+                      "secondary": "#006d37",
+                      "outline": "#6f797a",
+                      "surface-variant": "#e2e2e5",
+                      "surface-container": "#eeeef0",
+                      "on-error": "#ffffff",
+                      "inverse-on-surface": "#f0f0f3",
+                      "primary-fixed-dim": "#8fd1d9",
+                      "on-primary-fixed-variant": "#004f55",
+                      "on-primary-fixed": "#002023",
+                      "on-primary": "#ffffff",
+                      "tertiary-container": "#4f5454",
+                      "tertiary": "#383d3d",
+                      "on-error-container": "#93000a",
+                      "inverse-primary": "#8fd1d9",
+                      "on-secondary-fixed": "#00210c",
+                      "on-tertiary": "#ffffff",
+                      "on-surface": "#1a1c1e",
+                      "surface-bright": "#f9f9fc",
+                      "error": "#ba1a1a",
+                      "surface-container-lowest": "#ffffff",
+                      "on-secondary-container": "#00743a",
+                      "surface-container-high": "#e8e8ea",
+                      "secondary-fixed-dim": "#72dc91",
+                      "outline-variant": "#bfc8c9",
+                      "primary-fixed": "#abeef6",
+                      "inverse-surface": "#2f3133",
+                      "surface-container-highest": "#e2e2e5",
+                      "primary": "#004349",
+                      "on-tertiary-fixed-variant": "#434848",
+                      "surface-container-low": "#f3f3f6",
+                      "on-tertiary-fixed": "#181c1d",
+                      "secondary-container": "#8ef9ab",
+                      "on-background": "#1a1c1e",
+                      "surface": "#f9f9fc",
+                      "surface-tint": "#20686f"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "xl": "32px",
+                      "margin-mobile": "16px",
+                      "margin-desktop": "64px",
+                      "xxl": "48px",
+                      "lg": "24px",
+                      "sm": "8px",
+                      "md": "16px",
+                      "xs": "4px",
+                      "gutter": "24px",
+                      "base": "4px"
+              },
+              "fontFamily": {
+                      "body-lg": ["Inter"],
+                      "label-md": ["Inter"],
+                      "body-md": ["Inter"],
+                      "display-lg": ["Plus Jakarta Sans"],
+                      "headline-lg-mobile": ["Plus Jakarta Sans"],
+                      "label-sm": ["Inter"],
+                      "headline-md": ["Plus Jakarta Sans"],
+                      "headline-lg": ["Plus Jakarta Sans"]
+              },
+              "fontSize": {
+                      "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                      "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "500"}],
+                      "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                      "display-lg": ["48px", {"lineHeight": "60px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                      "headline-lg-mobile": ["28px", {"lineHeight": "36px", "fontWeight": "600"}],
+                      "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.04em", "fontWeight": "600"}],
+                      "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                      "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600"}]
+              }
+      },
+          },
+        }
+      </script>
+<style>
+        .material-symbols-outlined {
+          font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .material-symbols-outlined.fill {
+          font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+      </style>
+</head>
+<body class="bg-background text-on-background font-body-md antialiased overflow-x-hidden flex h-screen">
+<!-- Admin SideNavBar -->
+<nav class="bg-surface-container-highest dark:bg-surface-dim text-primary dark:text-primary-fixed font-label-md text-label-md docked left-0 h-full w-72 shadow-md flex flex-col h-screen p-lg gap-md hidden md:flex z-50 sticky top-0 shrink-0">
+<!-- Header -->
+<div class="flex items-center gap-sm mb-lg">
+<img class="w-12 h-12 rounded-full object-cover border border-outline-variant" data-alt="A professional headshot of a veterinary administrator in a modern, well-lit office setting. The individual is wearing a crisp white coat over a light blue collared shirt. Soft, natural light illuminates their face, conveying a sense of calm authority and clinical expertise. The background is a slightly blurred, high-key modern medical facility interior with subtle teal accents." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDWFpcYQmOlXhpgaTxI93bnTU7WgpnTSe0QbMqcQcEKTsOgo1VF9vJ2xsw2lJJXc-agj7ttIQ2f0kCSw1RIxRJifS1bYdxOHRSSXXmFpedwi1Xd8KbJC9NQ1IuZOQWzQqMULdbJkv6l9u5x0jPYc2CuA36FRoP5WPvHfyoDOfH6xzla1klRGHwDzASE6UNuyjgcJ8LnFPbeTBe7Si-cNKqURJtXMyIG-bVmosKlt69W0tC-Y6XJA2-S"/>
+<div>
+<h2 class="font-headline-sm text-headline-sm font-bold text-primary">Vetora Admin</h2>
+<p class="text-on-surface-variant text-label-sm">Institutional Dashboard</p>
+</div>
+</div>
+<!-- Navigation Links -->
+<ul class="flex-1 flex flex-col gap-xs w-full">
+<li>
+<a class="flex items-center gap-sm p-sm bg-primary text-on-primary rounded-lg shadow-sm opacity-90 transition-opacity" href="#">
+<span class="material-symbols-outlined fill">dashboard</span>
+                    Overview
+                </a>
+</li>
+<li>
+<a class="flex items-center gap-sm p-sm text-on-surface-variant hover:bg-surface-container-high rounded-lg hover:translate-x-1 transition-transform" href="#">
+<span class="material-symbols-outlined">library_books</span>
+                    Courses
+                </a>
+</li>
+<li>
+<a class="flex items-center gap-sm p-sm text-on-surface-variant hover:bg-surface-container-high rounded-lg hover:translate-x-1 transition-transform" href="#">
+<span class="material-symbols-outlined">group</span>
+                    Students
+                </a>
+</li>
+<li>
+<a class="flex items-center gap-sm p-sm text-on-surface-variant hover:bg-surface-container-high rounded-lg hover:translate-x-1 transition-transform" href="#">
+<span class="material-symbols-outlined">analytics</span>
+                    Analytics
+                </a>
+</li>
+<li>
+<a class="flex items-center gap-sm p-sm text-on-surface-variant hover:bg-surface-container-high rounded-lg hover:translate-x-1 transition-transform" href="#">
+<span class="material-symbols-outlined">settings</span>
+                    Settings
+                </a>
+</li>
+</ul>
+</nav>
+<!-- Main Content Area -->
+<main class="flex-1 overflow-y-auto w-full">
+<!-- Mobile Header (Visible only on small screens) -->
+<header class="md:hidden bg-surface-bright border-b border-outline-variant p-md flex items-center justify-between sticky top-0 z-40 shadow-sm">
+<h1 class="font-headline-md text-headline-md font-bold text-primary">Vetora</h1>
+<button class="text-on-surface-variant">
+<span class="material-symbols-outlined">menu</span>
+</button>
+</header>
+<div class="p-margin-mobile md:p-margin-desktop max-w-7xl mx-auto space-y-xl">
+<!-- Dashboard Header -->
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-md mb-xl border-b border-outline-variant pb-md">
+<div>
+<h1 class="font-headline-lg text-headline-lg font-bold text-primary mb-xs">Dashboard Overview</h1>
+<p class="text-on-surface-variant font-body-md text-body-md">Welcome back, Dr. Aris. Here is the latest performance data across the institution.</p>
+</div>
+<div class="flex gap-sm">
+<button class="bg-surface border border-primary text-primary px-md py-sm rounded-lg font-label-md hover:bg-primary-container hover:text-on-primary-container transition-colors shadow-sm">Generate Report</button>
+</div>
+</div>
+<!-- Top Metrics Cards -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-md">
+<div class="bg-surface rounded-xl p-lg border border-outline-variant shadow-[0px_2px_4px_rgba(13,92,99,0.08)] hover:border-primary hover:shadow-[0px_8px_16px_rgba(13,92,99,0.12)] transition-all">
+<div class="flex items-center gap-sm mb-md">
+<div class="p-sm bg-primary-container rounded-lg text-on-primary-container">
+<span class="material-symbols-outlined fill">group</span>
+</div>
+<h3 class="font-label-md text-label-md text-on-surface-variant">Total Students</h3>
+</div>
+<p class="font-headline-lg text-headline-lg font-bold text-on-surface">4,250</p>
+<p class="text-label-sm font-label-sm text-secondary mt-xs flex items-center gap-xs"><span class="material-symbols-outlined text-[16px]">trending_up</span> +5% this month</p>
+</div>
+<div class="bg-surface rounded-xl p-lg border border-outline-variant shadow-[0px_2px_4px_rgba(13,92,99,0.08)] hover:border-primary hover:shadow-[0px_8px_16px_rgba(13,92,99,0.12)] transition-all">
+<div class="flex items-center gap-sm mb-md">
+<div class="p-sm bg-secondary-container rounded-lg text-on-secondary-container">
+<span class="material-symbols-outlined fill">how_to_reg</span>
+</div>
+<h3 class="font-label-md text-label-md text-on-surface-variant">Active Students</h3>
+</div>
+<p class="font-headline-lg text-headline-lg font-bold text-on-surface">1,840</p>
+<p class="text-label-sm font-label-sm text-on-surface-variant mt-xs">Currently engaged</p>
+</div>
+<div class="bg-surface rounded-xl p-lg border border-outline-variant shadow-[0px_2px_4px_rgba(13,92,99,0.08)] hover:border-primary hover:shadow-[0px_8px_16px_rgba(13,92,99,0.12)] transition-all">
+<div class="flex items-center gap-sm mb-md">
+<div class="p-sm bg-primary-container rounded-lg text-on-primary-container">
+<span class="material-symbols-outlined fill">check_circle</span>
+</div>
+<h3 class="font-label-md text-label-md text-on-surface-variant">Completion Rate</h3>
+</div>
+<p class="font-headline-lg text-headline-lg font-bold text-on-surface">72%</p>
+<div class="w-full h-1 bg-surface-variant rounded-full mt-sm overflow-hidden">
+<div class="h-full bg-secondary w-[72%]"></div>
+</div>
+</div>
+<div class="bg-surface rounded-xl p-lg border border-outline-variant shadow-[0px_2px_4px_rgba(13,92,99,0.08)] hover:border-primary hover:shadow-[0px_8px_16px_rgba(13,92,99,0.12)] transition-all">
+<div class="flex items-center gap-sm mb-md">
+<div class="p-sm bg-primary-container rounded-lg text-on-primary-container">
+<span class="material-symbols-outlined fill">school</span>
+</div>
+<h3 class="font-label-md text-label-md text-on-surface-variant">Avg Assessment</h3>
+</div>
+<p class="font-headline-lg text-headline-lg font-bold text-on-surface">84%</p>
+<p class="text-label-sm font-label-sm text-secondary mt-xs flex items-center gap-xs"><span class="material-symbols-outlined text-[16px]">trending_up</span> +2% vs last term</p>
+</div>
+</div>
+<!-- Main Content Bento Grid -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-lg">
+<!-- Actionable Analytics -->
+<div class="lg:col-span-2 bg-surface rounded-xl border border-outline-variant shadow-[0px_2px_4px_rgba(13,92,99,0.08)] p-lg flex flex-col">
+<div class="flex items-center justify-between mb-md">
+<h2 class="font-headline-md text-headline-md font-semibold text-on-surface flex items-center gap-sm">
+<span class="material-symbols-outlined text-primary">insights</span>
+                            Actionable Analytics
+                        </h2>
+</div>
+<div class="space-y-md flex-1">
+<!-- Insight Item 1 -->
+<div class="flex gap-md p-md bg-error-container/20 rounded-lg border border-error-container">
+<div class="mt-1">
+<span class="material-symbols-outlined text-error fill">warning</span>
+</div>
+<div>
+<p class="font-body-md text-body-md text-on-surface font-medium">23% of students drop off during Module 3 of Surgery Basics</p>
+<p class="text-label-sm text-on-surface-variant mt-xs">Suggested Action: Review video lecture clarity and split assessment into smaller parts.</p>
+<button class="mt-sm text-primary font-label-md hover:underline">Review Module Content</button>
+</div>
+</div>
+<!-- Insight Item 2 -->
+<div class="flex gap-md p-md bg-surface-container rounded-lg border border-outline-variant">
+<div class="mt-1">
+<span class="material-symbols-outlined text-on-surface-variant fill">trending_down</span>
+</div>
+<div>
+<p class="font-body-md text-body-md text-on-surface font-medium">Assessment performance dropped by 12% in Internal Medicine</p>
+<p class="text-label-sm text-on-surface-variant mt-xs">Recent cohort scored lower on 'Canine Cardiology' section.</p>
+<button class="mt-sm text-primary font-label-md hover:underline">View Detailed Scores</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Students Needing Attention -->
+<div class="bg-surface rounded-xl border border-outline-variant shadow-[0px_2px_4px_rgba(13,92,99,0.08)] p-lg flex flex-col">
+<div class="flex items-center justify-between mb-md">
+<h2 class="font-headline-md text-headline-md font-semibold text-on-surface flex items-center gap-sm">
+<span class="material-symbols-outlined text-error">assignment_late</span>
+                            Attention Needed
+                        </h2>
+</div>
+<ul class="flex-1 space-y-sm overflow-y-auto max-h-[300px] pr-sm">
+<li class="flex items-center justify-between p-sm hover:bg-surface-container rounded-lg transition-colors border border-transparent hover:border-outline-variant">
+<div class="flex items-center gap-sm">
+<div class="w-8 h-8 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center font-bold text-label-sm">JD</div>
+<div>
+<p class="font-label-md text-on-surface font-semibold">Jane Doe</p>
+<p class="text-label-sm text-on-surface-variant">Surgery Basics</p>
+</div>
+</div>
+<span class="bg-error-container text-on-error-container px-2 py-1 rounded text-label-sm font-bold">At Risk</span>
+</li>
+<li class="flex items-center justify-between p-sm hover:bg-surface-container rounded-lg transition-colors border border-transparent hover:border-outline-variant">
+<div class="flex items-center gap-sm">
+<div class="w-8 h-8 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center font-bold text-label-sm">AS</div>
+<div>
+<p class="font-label-md text-on-surface font-semibold">Alex Smith</p>
+<p class="text-label-sm text-on-surface-variant">Internal Medicine</p>
+</div>
+</div>
+<span class="bg-error-container text-on-error-container px-2 py-1 rounded text-label-sm font-bold">At Risk</span>
+</li>
+<li class="flex items-center justify-between p-sm hover:bg-surface-container rounded-lg transition-colors border border-transparent hover:border-outline-variant">
+<div class="flex items-center gap-sm">
+<div class="w-8 h-8 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center font-bold text-label-sm">MW</div>
+<div>
+<p class="font-label-md text-on-surface font-semibold">Maria Garcia</p>
+<p class="text-label-sm text-on-surface-variant">Equine Anatomy</p>
+</div>
+</div>
+<span class="bg-surface-variant text-on-surface-variant px-2 py-1 rounded text-label-sm font-bold">Inactive</span>
+</li>
+</ul>
+<button class="mt-md w-full py-sm border border-outline-variant rounded-lg text-primary font-label-md hover:bg-surface-container transition-colors text-center">View All Students</button>
+</div>
+</div>
+<!-- Course Performance Table -->
+<div class="bg-surface rounded-xl border border-outline-variant shadow-[0px_2px_4px_rgba(13,92,99,0.08)] overflow-hidden">
+<div class="p-lg border-b border-outline-variant flex justify-between items-center">
+<h2 class="font-headline-md text-headline-md font-semibold text-on-surface">Course Performance</h2>
+<button class="text-primary font-label-md hover:underline flex items-center gap-xs"><span class="material-symbols-outlined text-[18px]">filter_list</span> Filter</button>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-low text-on-surface-variant font-label-sm uppercase tracking-wider">
+<th class="p-md font-semibold">Course Name</th>
+<th class="p-md font-semibold">Instructor</th>
+<th class="p-md font-semibold">Enrollments</th>
+<th class="p-md font-semibold">Status</th>
+<th class="p-md font-semibold text-right">Actions</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant">
+<tr class="hover:bg-surface-container-low transition-colors group">
+<td class="p-md font-medium text-on-surface">Surgery Basics</td>
+<td class="p-md text-on-surface-variant">Dr. E. Miller</td>
+<td class="p-md text-on-surface">420</td>
+<td class="p-md"><span class="bg-secondary-container text-on-secondary-container px-2 py-1 rounded text-label-sm font-bold">Published</span></td>
+<td class="p-md text-right"><button class="text-on-surface-variant hover:text-primary transition-colors"><span class="material-symbols-outlined">more_vert</span></button></td>
+</tr>
+<tr class="bg-tertiary-fixed/30 hover:bg-surface-container-low transition-colors group">
+<td class="p-md font-medium text-on-surface">Internal Medicine Advanced</td>
+<td class="p-md text-on-surface-variant">Dr. S. Chen</td>
+<td class="p-md text-on-surface">315</td>
+<td class="p-md"><span class="bg-secondary-container text-on-secondary-container px-2 py-1 rounded text-label-sm font-bold">Published</span></td>
+<td class="p-md text-right"><button class="text-on-surface-variant hover:text-primary transition-colors"><span class="material-symbols-outlined">more_vert</span></button></td>
+</tr>
+<tr class="hover:bg-surface-container-low transition-colors group">
+<td class="p-md font-medium text-on-surface">Exotic Animal Care</td>
+<td class="p-md text-on-surface-variant">Dr. J. Davis</td>
+<td class="p-md text-on-surface">150</td>
+<td class="p-md"><span class="bg-surface-variant text-on-surface-variant px-2 py-1 rounded text-label-sm font-bold">Draft</span></td>
+<td class="p-md text-right"><button class="text-on-surface-variant hover:text-primary transition-colors"><span class="material-symbols-outlined">more_vert</span></button></td>
+</tr>
+<tr class="bg-tertiary-fixed/30 hover:bg-surface-container-low transition-colors group">
+<td class="p-md font-medium text-on-surface">Veterinary Pharmacology</td>
+<td class="p-md text-on-surface-variant">Dr. A. Patel</td>
+<td class="p-md text-on-surface">280</td>
+<td class="p-md"><span class="bg-secondary-container text-on-secondary-container px-2 py-1 rounded text-label-sm font-bold">Published</span></td>
+<td class="p-md text-right"><button class="text-on-surface-variant hover:text-primary transition-colors"><span class="material-symbols-outlined">more_vert</span></button></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</main>
+</body></html>
