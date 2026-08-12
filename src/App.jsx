@@ -10,6 +10,9 @@ import Learning from './pages/Learning';
 import Explore from './pages/Explore';
 import Clinical from './pages/Clinical';
 import Admin from './pages/Admin';
+import Certificates from './pages/Certificates';
+import VetoraAI from './pages/VetoraAI';
+import Profile from './pages/Profile';
 
 function App() {
   return (
@@ -24,6 +27,9 @@ function App() {
           <Route path="/learning" element={<Learning />} />
           <Route path="/explore" element={<Explore />} />
           <Route path="/clinical" element={<Clinical />} />
+          <Route path="/certificates" element={<Certificates />} />
+          <Route path="/ai" element={<VetoraAI />} />
+          <Route path="/profile" element={<Profile />} />
           <Route path="/admin" element={<Admin />} />
           <Route path="/" element={<DashboardLayout />}>
             <Route path="dashboard" element={<Dashboard />} />

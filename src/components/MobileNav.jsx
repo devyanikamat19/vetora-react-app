@@ -1,40 +1,66 @@
 import React from 'react';
+import { Link, useLocation } from 'react-router-dom';
+import { useApp } from '../context/AppContext';
+
+const mobileNavItems = [
+  { icon: 'home', label: 'Home', to: '/dashboard' },
+  { icon: 'explore', label: 'Explore', to: '/explore' },
+  { icon: 'school', label: 'Learning', to: '/my-learning' },
+  { icon: 'medical_services', label: 'Cases', to: '/clinical' },
+  { icon: 'smart_toy', label: 'AI', to: '/ai' },
+  { icon: 'verified', label: 'Certs', to: '/certificates' },
+  { icon: 'person', label: 'Profile', to: '/profile' },
+];
 
 const MobileNav = () => {
+  const location = useLocation();
+  const { user } = useApp();
+
   return (
     <>
-      {/* Top Navigation (Mobile Only) */}
-      <nav className="md:hidden flex justify-between items-center w-full px-6 py-2 bg-surface-bright border-b border-outline-variant shadow-sm sticky top-0 z-40">
-        <div className="font-display text-2xl font-bold text-primary">Vetora</div>
-        <div className="flex items-center gap-2">
-          <button className="hover:bg-surface-container-high rounded-full p-2 text-on-surface-variant transition-colors">
-            <span className="material-symbols-outlined">notifications</span>
-          </button>
-          <img alt="User Profile" className="w-8 h-8 rounded-full object-cover border border-outline-variant" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBQQQr3lB67ZHVCfkNoN3Z-evoAYA7zm8FIrcXoc5Ko17bq9WDFkZ0UxfBcPxBYnPRPca8obXAlLTjefCWg4jS3LOrC2JxlADFgPP9wKA4mvsEvPZ266cDctr13b-_zCpHxFmBaBk9ODj1fddl1x0uHjl3_AUy48ZDfcNFb-0FqdjEVB0-abrOcuvsbXH2WeviUTCNXFMMsbbeEOPRmB7uC5MGRXlRMIecrOxXRn3mXN9qeZdh-n36I"/>
+      {/* Top Header Navigation (Mobile Only) */}
+      <nav className="md:hidden flex justify-between items-center w-full px-4 py-2.5 bg-white border-b border-gray-200/80 sticky top-0 z-40 shadow-2xs">
+        <Link to="/dashboard" className="font-display text-xl font-bold text-[#0d5c63] tracking-tight">
+          Vetora
+        </Link>
+        <div className="flex items-center gap-3">
+          <Link to="/profile" className="flex items-center gap-2">
+            <img
+              alt="User Profile"
+              className="w-8 h-8 rounded-full object-cover border border-gray-200"
+              src={user?.avatar || "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=150&auto=format&fit=crop&q=80"}
+            />
+          </Link>
         </div>
       </nav>
 
-      {/* Bottom Navigation (Mobile Only) */}
-      <nav className="md:hidden flex justify-around items-center w-full bg-surface border-t border-outline-variant fixed bottom-0 z-40 pb-safe shadow-[0_-2px_10px_rgba(0,0,0,0.05)]">
-        <a className="flex flex-col items-center justify-center w-full py-2 text-primary" href="#">
-          <span className="material-symbols-outlined mb-1" style={{ fontVariationSettings: "'FILL' 1" }}>home</span>
-          <span className="font-sans text-[10px] font-bold">Home</span>
-        </a>
-        <a className="flex flex-col items-center justify-center w-full py-2 text-on-surface-variant" href="#">
-          <span className="material-symbols-outlined mb-1">explore</span>
-          <span className="font-sans text-[10px]">Explore</span>
-        </a>
-        <a className="flex flex-col items-center justify-center w-full py-2 text-on-surface-variant" href="#">
-          <span className="material-symbols-outlined mb-1">school</span>
-          <span className="font-sans text-[10px]">Learning</span>
-        </a>
-        <a className="flex flex-col items-center justify-center w-full py-2 text-on-surface-variant" href="#">
-          <span className="material-symbols-outlined mb-1">person</span>
-          <span className="font-sans text-[10px]">Profile</span>
-        </a>
+      {/* Bottom Bar Navigation (Mobile Only) */}
+      <nav className="md:hidden flex justify-around items-center w-full bg-white border-t border-gray-200/80 fixed bottom-0 z-50 py-1.5 px-1 shadow-lg">
+        {mobileNavItems.map(item => {
+          const isActive = location.pathname === item.to || (item.to !== '/' && location.pathname.startsWith(item.to));
+
+          return (
+            <Link
+              key={item.label}
+              to={item.to}
+              className={`flex flex-col items-center justify-center py-1 px-1 rounded-xl transition-all ${
+                isActive ? 'text-[#0d5c63] font-bold bg-[#0d5c63]/10' : 'text-gray-500 hover:text-gray-800'
+              }`}
+            >
+              <span
+                className="material-symbols-outlined text-[18px]"
+                style={isActive ? { fontVariationSettings: "'FILL' 1" } : {}}
+              >
+                {item.icon}
+              </span>
+              <span className="font-sans text-[9px] mt-0.5">{item.label}</span>
+            </Link>
+          );
+        })}
       </nav>
     </>
   );
 };
 
 export default MobileNav;
+

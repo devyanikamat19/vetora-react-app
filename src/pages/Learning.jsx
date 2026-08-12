@@ -1,231 +1,228 @@
 import React, { useState } from 'react';
-import { useNavigate, useParams, useLocation } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
+
+const TRANSCRIPT_LINES = [
+  { time: '11:42', text: 'When we approach a thoracic radiograph, the first step is always evaluating technical quality. Is it a true orthogonal projection?' },
+  { time: '12:05', text: 'Look at the alignment of the sternum and the spine on the ventrodorsal view. They should be superimposed.' },
+  { time: '12:45', text: 'Moving past technical evaluation, we begin our systematic review. I prefer an outside-in approach, starting with the extrathoracic structures before moving to the pleural space.', active: true },
+  { time: '13:10', text: 'Notice here on the lateral view, the soft tissue opacity in the cranial mediastinum. In a young dog, this is typically the thymus.' },
+  { time: '13:45', text: 'However, in an older patient, we must consider differentials like lymphoma, thymoma, or other mediastinal masses.' },
+  { time: '14:20', text: "Now, let's focus on the cardiac silhouette. We'll use the vertebral heart score method to quantify cardiomegaly." },
+];
 
 const Learning = () => {
   const navigate = useNavigate();
-  const location = useLocation();
-  const { courseId, lessonId } = useParams();
-  const { courses, showToast } = useApp();
-
-  // Get lesson/course from navigation state (passed from MyLearning) or from params
-  const stateLesson = location.state?.lesson;
-  const stateCourse = location.state?.course;
-  const stateModule = location.state?.module;
-
-  // Resolve course and lesson from context if state isn't available
-  const course = stateCourse || courses.find(c => c.id === courseId) || courses[0];
-  const allLessons = course?.modules?.flatMap(m => m.lessons.map(l => ({ ...l, moduleTitle: m.title }))) || [];
-  const currentLesson = stateLesson || allLessons.find(l => l.id === lessonId) || allLessons[0];
-  const currentModule = stateModule || course?.modules?.find(m => m.lessons.some(l => l.id === currentLesson?.id));
-
-  const currentIndex = allLessons.findIndex(l => l.id === currentLesson?.id);
-  const prevLesson = currentIndex > 0 ? allLessons[currentIndex - 1] : null;
-  const nextLesson = currentIndex < allLessons.length - 1 ? allLessons[currentIndex + 1] : null;
+  const { showToast } = useApp();
 
   const [isBookmarked, setIsBookmarked] = useState(false);
-  const [activeTab, setActiveTab] = useState('overview');
-
-  const navigateToLesson = (lesson) => {
-    const lessonModule = course?.modules?.find(m => m.lessons.some(l => l.id === lesson.id));
-    navigate(`/learning/${course.id}/${lesson.id}`, {
-      state: { lesson, course, module: lessonModule }
-    });
-  };
-
-  if (!course || !currentLesson) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="text-center">
-          <p className="font-sans text-on-surface-variant mb-4">No lesson found. Please go back and select a lesson.</p>
-          <button onClick={() => navigate('/my-learning')} className="px-6 py-3 bg-primary text-on-primary rounded-lg font-sans font-bold">
-            Go to My Learning
-          </button>
-        </div>
-      </div>
-    );
-  }
+  const [activeTab, setActiveTab] = useState('Overview');
+  const [selectedTimestamp, setSelectedTimestamp] = useState('12:45');
 
   return (
-    <div className="bg-background text-on-background font-sans antialiased min-h-screen flex flex-col">
+    <div className="bg-[#f4f7f6] text-gray-900 font-sans antialiased min-h-screen flex flex-col">
 
-      {/* Top Navigation */}
-      <header className="bg-surface border-b border-outline-variant shadow-sm sticky top-0 z-40">
-        <div className="flex items-center w-full px-4 py-3 gap-4">
-          <button onClick={() => navigate('/my-learning')} className="flex items-center gap-1 hover:bg-surface-container-high p-2 rounded-full transition-colors shrink-0">
-            <span className="material-symbols-outlined text-primary">arrow_back</span>
-          </button>
-          <div className="flex-1 min-w-0">
-            <h1 className="font-display text-base md:text-lg font-bold text-on-surface truncate">{currentLesson.title}</h1>
-            <p className="font-sans text-xs text-on-surface-variant truncate">{course.title} · {currentModule?.title}</p>
-          </div>
+      {/* Top Header Navigation (Image 4) */}
+      <header className="bg-white border-b border-gray-200/80 px-6 py-3 flex items-center justify-between sticky top-0 z-40 shadow-2xs">
+        <div className="flex items-center gap-4">
           <button
-            onClick={() => { setIsBookmarked(!isBookmarked); showToast(isBookmarked ? 'Bookmark removed.' : 'Lecture bookmarked!', 'success'); }}
-            className={`rounded-full p-2 transition-colors shrink-0 ${isBookmarked ? 'text-primary bg-primary-container' : 'text-on-surface-variant hover:bg-surface-container-high'}`}
+            onClick={() => navigate('/my-learning')}
+            className="p-1.5 text-[#0d5c63] hover:bg-[#0d5c63]/10 rounded-full transition-colors"
           >
-            <span className="material-symbols-outlined" style={isBookmarked ? { fontVariationSettings: "'FILL' 1" } : {}}>bookmark</span>
+            <span className="material-symbols-outlined text-[20px]">arrow_back</span>
+          </button>
+          <div>
+            <h1 className="font-display text-base font-bold text-gray-900 leading-tight">
+              Diagnostic Approach to Thoracic Radiography
+            </h1>
+            <p className="font-sans text-xs text-gray-500 font-medium">Module 3: Advanced Imaging Techniques</p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => {
+              setIsBookmarked(!isBookmarked);
+              showToast(isBookmarked ? 'Bookmark removed.' : 'Lecture bookmarked!', 'success');
+            }}
+            className={`p-2 rounded-full transition-colors ${
+              isBookmarked ? 'text-[#0d5c63] bg-[#0d5c63]/10' : 'text-gray-400 hover:text-gray-600'
+            }`}
+          >
+            <span className="material-symbols-outlined text-[20px]" style={isBookmarked ? { fontVariationSettings: "'FILL' 1" } : {}}>
+              bookmark
+            </span>
+          </button>
+          <button onClick={() => showToast('Lecture settings opened.', 'info')} className="p-2 text-gray-400 hover:text-gray-600 rounded-full">
+            <span className="material-symbols-outlined text-[20px]">more_vert</span>
           </button>
         </div>
       </header>
 
-      <div className="flex flex-1 flex-col lg:flex-row min-h-0">
-
-        {/* ── Left: Video + Tabs ─────────────────────────────────────────── */}
+      {/* Main Canvas Area */}
+      <div className="flex-1 flex flex-col lg:flex-row min-h-0 bg-white">
+        
+        {/* Left: Video Player & Overview Content (Image 4) */}
         <section className="flex-1 flex flex-col overflow-y-auto">
-
-          {/* Real YouTube Embed */}
-          <div className="w-full bg-black">
-            <div className="relative w-full" style={{ paddingTop: '56.25%' }}>
-              <iframe
-                key={currentLesson.videoId}
-                className="absolute inset-0 w-full h-full"
-                src={`https://www.youtube.com/embed/${currentLesson.videoId}?autoplay=1&rel=0&modestbranding=1`}
-                title={currentLesson.title}
-                frameBorder="0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                allowFullScreen
-              />
-            </div>
+          {/* Main Video Canvas */}
+          <div className="w-full bg-slate-900 aspect-video relative flex items-center justify-center overflow-hidden">
+            <iframe
+              className="w-full h-full"
+              src="https://www.youtube.com/embed/fNxaJsNG3-s?autoplay=1&rel=0&modestbranding=1"
+              title="Thoracic Radiography Lecture"
+              frameBorder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+            />
           </div>
 
-          {/* Prev / Next navigation */}
-          <div className="flex items-center justify-between px-6 py-3 border-b border-outline-variant bg-surface-container-lowest">
-            <button
-              disabled={!prevLesson}
-              onClick={() => prevLesson && navigateToLesson(prevLesson)}
-              className="flex items-center gap-2 font-sans text-sm font-medium disabled:opacity-30 disabled:cursor-not-allowed text-on-surface-variant hover:text-primary transition-colors"
-            >
-              <span className="material-symbols-outlined text-[18px]">navigate_before</span>
-              {prevLesson ? prevLesson.title : 'No previous'}
-            </button>
-            <button
-              disabled={!nextLesson}
-              onClick={() => nextLesson && navigateToLesson(nextLesson)}
-              className="flex items-center gap-2 font-sans text-sm font-medium disabled:opacity-30 disabled:cursor-not-allowed text-on-surface-variant hover:text-primary transition-colors"
-            >
-              {nextLesson ? nextLesson.title : 'Course complete!'}
-              <span className="material-symbols-outlined text-[18px]">navigate_next</span>
-            </button>
-          </div>
-
-          {/* Tabs */}
-          <div className="border-b border-outline-variant bg-surface sticky top-[57px] z-10">
-            <nav className="flex px-4 overflow-x-auto" style={{ scrollbarWidth: 'none' }}>
-              {['overview', 'notes', 'resources'].map(tab => (
+          {/* Sub-tabs Header Bar */}
+          <div className="border-b border-gray-200 px-6 bg-white sticky top-0 z-10">
+            <nav className="flex gap-8">
+              {['Overview', 'Resources', 'Notes', 'Vetora AI'].map(tab => (
                 <button
                   key={tab}
                   onClick={() => setActiveTab(tab)}
-                  className={`px-5 py-3 font-sans text-sm font-medium capitalize whitespace-nowrap border-b-2 transition-colors
-                    ${activeTab === tab ? 'text-primary border-primary' : 'text-on-surface-variant border-transparent hover:text-on-surface'}`}
+                  className={`py-3.5 font-sans text-xs font-bold border-b-2 transition-colors flex items-center gap-1.5 ${
+                    activeTab === tab
+                      ? 'border-[#0d5c63] text-[#0d5c63]'
+                      : 'border-transparent text-gray-500 hover:text-gray-800'
+                  }`}
                 >
+                  {tab === 'Vetora AI' && (
+                    <span className="material-symbols-outlined text-[16px] text-cyan-600">smart_toy</span>
+                  )}
                   {tab}
                 </button>
               ))}
             </nav>
           </div>
 
-          {/* Tab Content */}
-          <div className="p-6 max-w-3xl">
-            {activeTab === 'overview' && (
+          {/* Tab Content Canvas (Image 4 style) */}
+          <div className="p-6 md:p-8 max-w-4xl space-y-6">
+            {activeTab === 'Overview' && (
               <>
-                <h2 className="font-display text-2xl font-bold text-on-surface mb-3">{currentLesson.title}</h2>
-                <p className="font-sans text-base text-on-surface-variant mb-6">
-                  This session is part of the <strong className="text-on-surface">{currentModule?.title}</strong> module in <strong className="text-on-surface">{course.title}</strong>. Work through the video above, then proceed to the next lesson at your own pace.
-                </p>
-                <h3 className="font-sans text-sm font-bold text-primary uppercase tracking-wider mb-3 border-b border-outline-variant pb-2">Learning Objectives</h3>
-                <ul className="space-y-3">
-                  {['Understand core concepts presented in this lesson', 'Apply the principles to real clinical scenarios', 'Identify key differentials and diagnostic approaches'].map((obj, i) => (
-                    <li key={i} className="flex items-start gap-3">
-                      <span className="material-symbols-outlined text-secondary text-[20px] mt-0.5" style={{ fontVariationSettings: "'FILL' 1" }}>check_circle</span>
-                      <span className="font-sans text-base text-on-surface">{obj}</span>
+                <div>
+                  <h2 className="font-display text-xl font-bold text-gray-900 mb-2">Module Overview</h2>
+                  <p className="font-sans text-xs text-gray-600 leading-relaxed">
+                    In this comprehensive session, we explore the systematic approach to interpreting canine and feline thoracic radiographs. We will cover technical evaluation, normal anatomy, and standard diagnostic paradigms for evaluating the cardiovascular system, pulmonary parenchyma, pleural space, and mediastinum.
+                  </p>
+                </div>
+
+                {/* Learning Objectives Checklist (Image 4) */}
+                <div className="pt-4 border-t border-gray-100">
+                  <span className="font-sans text-[10px] font-bold text-gray-400 uppercase tracking-widest block mb-3">
+                    LEARNING OBJECTIVES
+                  </span>
+                  <ul className="space-y-2.5">
+                    <li className="flex items-start gap-2.5">
+                      <span className="material-symbols-outlined text-emerald-600 text-[18px] mt-0.5" style={{ fontVariationSettings: "'FILL' 1" }}>
+                        check_circle
+                      </span>
+                      <span className="font-sans text-xs font-semibold text-gray-800">
+                        Identify and differentiate primary lung patterns (alveolar, bronchial, interstitial, vascular).
+                      </span>
                     </li>
-                  ))}
-                </ul>
-                <div className="mt-6 p-4 bg-surface-container-low rounded-xl border border-outline-variant flex items-center gap-4">
-                  <span className="material-symbols-outlined text-primary text-3xl">person</span>
-                  <div>
-                    <p className="font-sans text-sm font-bold text-on-surface">{course.instructor}</p>
-                    <p className="font-sans text-xs text-on-surface-variant">{course.tag} · {course.level}</p>
-                  </div>
+                    <li className="flex items-start gap-2.5">
+                      <span className="material-symbols-outlined text-emerald-600 text-[18px] mt-0.5" style={{ fontVariationSettings: "'FILL' 1" }}>
+                        check_circle
+                      </span>
+                      <span className="font-sans text-xs font-semibold text-gray-800">
+                        Systematically evaluate cardiac silhouette size and shape using standardized metrics.
+                      </span>
+                    </li>
+                  </ul>
                 </div>
               </>
             )}
-            {activeTab === 'notes' && (
-              <div>
-                <h2 className="font-display text-xl font-bold text-on-surface mb-4">My Notes</h2>
+
+            {activeTab === 'Resources' && (
+              <div className="space-y-3">
+                <h3 className="font-display text-base font-bold text-gray-900">Lecture Downloads</h3>
+                {['Thoracic_Radiography_Interpretation_Guide.pdf', 'Vertebral_Heart_Score_Reference_Sheet.pdf'].map(res => (
+                  <div key={res} className="p-3 bg-gray-50 rounded-xl border border-gray-200 flex items-center justify-between">
+                    <span className="font-sans text-xs font-semibold text-gray-800">{res}</span>
+                    <button onClick={() => showToast(`Downloading ${res}...`, 'success')} className="text-[#0d5c63] font-sans text-xs font-bold hover:underline">
+                      Download
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {activeTab === 'Notes' && (
+              <div className="space-y-3">
+                <h3 className="font-display text-base font-bold text-gray-900">Interactive Notes</h3>
                 <textarea
-                  className="w-full h-48 p-4 rounded-xl border border-outline-variant bg-surface-container-lowest font-sans text-sm text-on-surface focus:outline-none focus:border-primary resize-none"
-                  placeholder="Type your notes for this lesson here..."
+                  placeholder="Take notes synced with video timestamps..."
+                  className="w-full h-32 p-3 bg-gray-50 border border-gray-200 rounded-xl text-xs font-sans focus:outline-none focus:border-[#0d5c63]"
                 />
-                <button
-                  onClick={() => showToast('Notes saved!', 'success')}
-                  className="mt-3 px-5 py-2 bg-primary text-on-primary rounded-lg font-sans text-sm font-bold"
-                >
-                  Save Notes
+                <button onClick={() => showToast('Notes saved successfully!', 'success')} className="px-4 py-2 bg-[#0d5c63] text-white font-sans text-xs font-bold rounded-xl">
+                  Save Note
                 </button>
               </div>
             )}
-            {activeTab === 'resources' && (
-              <div>
-                <h2 className="font-display text-xl font-bold text-on-surface mb-4">Resources</h2>
-                <div className="space-y-3">
-                  {['Lecture Slides (PDF)', 'Recommended Reading List', 'Practice Quiz'].map((r, i) => (
-                    <button
-                      key={i}
-                      onClick={() => showToast('Resource download coming soon.', 'info')}
-                      className="w-full flex items-center gap-3 p-4 rounded-xl border border-outline-variant hover:border-primary hover:bg-surface-container-lowest transition-colors text-left"
-                    >
-                      <span className="material-symbols-outlined text-primary">description</span>
-                      <span className="font-sans text-sm font-medium text-on-surface">{r}</span>
-                      <span className="material-symbols-outlined text-on-surface-variant ml-auto text-[18px]">download</span>
-                    </button>
-                  ))}
-                </div>
+
+            {activeTab === 'Vetora AI' && (
+              <div className="p-4 bg-cyan-50/60 border border-cyan-200 rounded-2xl space-y-2">
+                <h3 className="font-sans text-xs font-bold text-[#0d5c63] flex items-center gap-1.5">
+                  <span className="material-symbols-outlined text-[16px]">smart_toy</span> Vetora AI Lecture Assistant
+                </h3>
+                <p className="font-sans text-xs text-gray-600">
+                  Ask questions about thoracic radiograph interpretation or request case examples based on this video module.
+                </p>
               </div>
             )}
           </div>
         </section>
 
-        {/* ── Right: Course Playlist ─────────────────────────────────────── */}
-        <aside className="w-full lg:w-80 xl:w-96 border-l border-outline-variant bg-surface-container-lowest flex flex-col shrink-0 max-h-screen lg:sticky lg:top-[57px] lg:h-[calc(100vh-57px)] overflow-y-auto">
-          <div className="p-4 border-b border-outline-variant bg-surface sticky top-0 z-10">
-            <h3 className="font-display text-base font-bold text-on-surface">Course Content</h3>
-            <p className="font-sans text-xs text-on-surface-variant mt-0.5">{allLessons.length} lessons · {course.duration}</p>
-          </div>
-          {course.modules.map((mod, modIndex) => (
-            <div key={mod.id}>
-              <div className="px-4 py-2.5 bg-surface-container-low border-b border-outline-variant/50">
-                <p className="font-sans text-xs font-bold text-on-surface-variant uppercase tracking-wider">Module {modIndex + 1}: {mod.title}</p>
-              </div>
-              {mod.lessons.map(lesson => {
-                const isActive = lesson.id === currentLesson.id;
-                return (
-                  <button
-                    key={lesson.id}
-                    onClick={() => navigateToLesson(lesson)}
-                    className={`w-full flex items-center gap-3 px-4 py-3 text-left border-b border-outline-variant/30 transition-colors
-                      ${isActive ? 'bg-primary-container/40 border-l-2 border-l-primary' : 'hover:bg-surface-container-low'}`}
-                  >
-                    <div className={`w-7 h-7 rounded-full flex items-center justify-center shrink-0
-                      ${isActive ? 'bg-primary text-on-primary' : lesson.completed ? 'bg-secondary text-on-secondary' : 'bg-surface-container-high text-on-surface-variant'}`}>
-                      <span className="material-symbols-outlined text-[16px]" style={(isActive || lesson.completed) ? { fontVariationSettings: "'FILL' 1" } : {}}>
-                        {isActive ? 'play_arrow' : lesson.completed ? 'check' : 'play_arrow'}
-                      </span>
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className={`font-sans text-sm truncate ${isActive ? 'text-primary font-bold' : 'text-on-surface'}`}>{lesson.title}</p>
-                      <p className="font-sans text-xs text-on-surface-variant">{lesson.duration}</p>
-                    </div>
-                  </button>
-                );
-              })}
+        {/* Right: Interactive Transcript Sidebar (Image 4 exact) */}
+        <aside className="w-full lg:w-96 border-l border-gray-200/80 bg-white flex flex-col shrink-0">
+          <div className="p-4 border-b border-gray-200 flex items-center justify-between bg-gray-50/50">
+            <h3 className="font-display text-sm font-bold text-gray-900">Transcript</h3>
+            <div className="flex items-center gap-1">
+              <button onClick={() => showToast('Searching transcript...', 'info')} className="p-1.5 text-gray-400 hover:text-gray-600 rounded-lg">
+                <span className="material-symbols-outlined text-[18px]">search</span>
+              </button>
+              <button onClick={() => showToast('Transcript sync toggled.', 'info')} className="p-1.5 text-gray-400 hover:text-gray-600 rounded-lg">
+                <span className="material-symbols-outlined text-[18px]">sync</span>
+              </button>
             </div>
-          ))}
-        </aside>
+          </div>
 
+          {/* Transcript Lines List */}
+          <div className="p-4 space-y-3 overflow-y-auto flex-1 max-h-[calc(100vh-120px)]">
+            {TRANSCRIPT_LINES.map((line) => {
+              const isSelected = selectedTimestamp === line.time;
+
+              return (
+                <div
+                  key={line.time}
+                  onClick={() => {
+                    setSelectedTimestamp(line.time);
+                    showToast(`Jumped to timestamp ${line.time}`, 'info');
+                  }}
+                  className={`p-3.5 rounded-2xl border transition-all cursor-pointer flex gap-3 ${
+                    isSelected
+                      ? 'bg-cyan-50/70 border-cyan-200 shadow-2xs'
+                      : 'border-transparent hover:bg-gray-50'
+                  }`}
+                >
+                  <span className={`font-sans text-xs font-bold shrink-0 ${isSelected ? 'text-[#0d5c63]' : 'text-gray-400'}`}>
+                    {line.time}
+                  </span>
+                  <p className={`font-sans text-xs leading-relaxed ${isSelected ? 'text-gray-900 font-semibold' : 'text-gray-600'}`}>
+                    {line.text}
+                  </p>
+                </div>
+              );
+            })}
+          </div>
+        </aside>
       </div>
     </div>
   );
 };
 
 export default Learning;
+

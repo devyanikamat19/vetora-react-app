@@ -5,61 +5,346 @@ import { COURSE_CATALOGUE } from '../context/AppContext';
 
 // ─── Mock student roster ───────────────────────────────────────────────────────
 const STUDENTS = [
-  { id: 's1', initials: 'JD', name: 'Jane Doe',      email: 'jane.doe@uni.edu',     course: 'Small Animal Clinical Medicine', progress: 78, score: 82, status: 'Active',   badge: 'On Track' },
-  { id: 's2', initials: 'AS', name: 'Alex Smith',    email: 'alex.s@uni.edu',       course: 'Advanced Soft Tissue Surgery',  progress: 22, score: 58, status: 'At Risk',  badge: 'At Risk' },
-  { id: 's3', initials: 'MG', name: 'Maria Garcia',  email: 'maria.g@uni.edu',      course: 'Small Animal Clinical Medicine', progress: 5,  score: 45, status: 'Inactive', badge: 'Inactive' },
-  { id: 's4', initials: 'RK', name: 'Ravi Kumar',    email: 'ravi.k@uni.edu',       course: 'Equine Internal Medicine',      progress: 91, score: 95, status: 'Active',   badge: 'Top Performer' },
-  { id: 's5', initials: 'LP', name: 'Laura Perez',   email: 'laura.p@uni.edu',      course: 'Avian and Exotic Pet Care',     progress: 60, score: 74, status: 'Active',   badge: 'On Track' },
-  { id: 's6', initials: 'TW', name: 'Tom Walsh',     email: 't.walsh@uni.edu',      course: 'Advanced Soft Tissue Surgery',  progress: 38, score: 61, status: 'At Risk',  badge: 'At Risk' },
-  { id: 's7', initials: 'AN', name: 'Aisha Nair',    email: 'aisha.n@uni.edu',      course: 'Equine Internal Medicine',      progress: 55, score: 79, status: 'Active',   badge: 'On Track' },
-  { id: 's8', initials: 'CH', name: 'Carlos Herrera',email: 'c.herrera@uni.edu',    course: 'Avian and Exotic Pet Care',     progress: 100,score: 98, status: 'Completed','badge': 'Top Performer' },
+  { id: 's1', initials: 'JD', name: 'Jane Doe', email: 'jane.doe@uni.edu', course: 'Small Animal Clinical Medicine', progress: 78, score: 82, status: 'Active', badge: 'On Track' },
+  { id: 's2', initials: 'AS', name: 'Alex Smith', email: 'alex.s@uni.edu', course: 'Advanced Soft Tissue Surgery', progress: 22, score: 58, status: 'At Risk', badge: 'At Risk' },
+  { id: 's3', initials: 'MG', name: 'Maria Garcia', email: 'maria.g@uni.edu', course: 'Small Animal Clinical Medicine', progress: 5, score: 45, status: 'Inactive', badge: 'Inactive' },
+  { id: 's4', initials: 'RK', name: 'Ravi Kumar', email: 'ravi.k@uni.edu', course: 'Equine Internal Medicine', progress: 91, score: 95, status: 'Active', badge: 'Top Performer' },
+  { id: 's5', initials: 'LP', name: 'Laura Perez', email: 'laura.p@uni.edu', course: 'Avian and Exotic Pet Care', progress: 60, score: 74, status: 'Active', badge: 'On Track' },
+  { id: 's6', initials: 'TW', name: 'Tom Walsh', email: 't.walsh@uni.edu', course: 'Advanced Soft Tissue Surgery', progress: 38, score: 61, status: 'At Risk', badge: 'At Risk' },
+  { id: 's7', initials: 'AN', name: 'Aisha Nair', email: 'aisha.n@uni.edu', course: 'Equine Internal Medicine', progress: 55, score: 79, status: 'Active', badge: 'On Track' },
+  { id: 's8', initials: 'CH', name: 'Carlos Herrera', email: 'c.herrera@uni.edu', course: 'Avian and Exotic Pet Care', progress: 100, score: 98, status: 'Completed', badge: 'Top Performer' },
 ];
 
 const BADGE_STYLES = {
-  'On Track':      'bg-secondary-container text-on-secondary-container',
-  'At Risk':       'bg-error-container text-on-error-container',
-  'Inactive':      'bg-surface-variant text-on-surface-variant',
-  'Top Performer': 'bg-primary-container text-on-primary-container',
-  'Completed':     'bg-primary text-on-primary',
+  'On Track': 'bg-emerald-100 text-emerald-800',
+  'At Risk': 'bg-red-100 text-red-800',
+  'Inactive': 'bg-gray-100 text-gray-700',
+  'Top Performer': 'bg-teal-100 text-teal-800',
+  'Completed': 'bg-[#0d5c63] text-white',
+};
+
+// ─── Course Creator Component (Image 4 exact implementation) ────────────────────
+const CourseCreator = ({ showToast, onBack }) => {
+  const [activeStep, setActiveStep] = useState(2); // Step 2: Curriculum by default matching Image 4
+  const [expandedModules, setExpandedModules] = useState({ m1: true, m2: false });
+  const [modules, setModules] = useState([
+    {
+      id: 'm1',
+      code: 'M1',
+      title: 'Module 1: Foundations of Clinical Care',
+      lessonCount: 3,
+      assessmentCount: 1,
+      lessons: [
+        { id: 'l1', type: 'video', title: '1.1 Introduction to Small Animal Anatomy', meta: 'Video • 12:45' },
+        { id: 'l2', type: 'reading', title: '1.2 Basic Handling and Restraint Techniques', meta: 'Reading • 15 min' },
+      ]
+    },
+    {
+      id: 'm2',
+      code: 'M2',
+      title: 'Module 2: Diagnostics and Imaging',
+      lessonCount: 0,
+      assessmentCount: 0,
+      lessons: []
+    }
+  ]);
+
+  const toggleModule = (id) => {
+    setExpandedModules(prev => ({ ...prev, [id]: !prev[id] }));
+  };
+
+  const handleAddModule = () => {
+    const newId = `m${modules.length + 1}`;
+    setModules(prev => [
+      ...prev,
+      {
+        id: newId,
+        code: `M${modules.length + 1}`,
+        title: `Module ${modules.length + 1}: New Clinical Section`,
+        lessonCount: 0,
+        assessmentCount: 0,
+        lessons: []
+      }
+    ]);
+    setExpandedModules(prev => ({ ...prev, [newId]: true }));
+    showToast('New module added to curriculum.', 'success');
+  };
+
+  const handleAddLesson = (moduleId) => {
+    setModules(prev => prev.map(m => {
+      if (m.id === moduleId) {
+        const nextNum = m.lessons.length + 1;
+        return {
+          ...m,
+          lessonCount: m.lessonCount + 1,
+          lessons: [
+            ...m.lessons,
+            { id: `l_${Date.now()}`, type: 'video', title: `${m.code}.${nextNum} Physical Diagnostics Practice`, meta: 'Video • 10:00' }
+          ]
+        };
+      }
+      return m;
+    }));
+    showToast('Lesson added to module.', 'success');
+  };
+
+  const handleAddQuiz = (moduleId) => {
+    setModules(prev => prev.map(m => {
+      if (m.id === moduleId) {
+        return {
+          ...m,
+          assessmentCount: m.assessmentCount + 1,
+          lessons: [
+            ...m.lessons,
+            { id: `q_${Date.now()}`, type: 'quiz', title: `Module Quiz: Knowledge Check`, meta: 'Quiz • 10 Questions' }
+          ]
+        };
+      }
+      return m;
+    }));
+    showToast('Quiz assessment added.', 'success');
+  };
+
+  const steps = [
+    { num: 1, label: 'Information' },
+    { num: 2, label: 'Curriculum' },
+    { num: 3, label: 'Lessons' },
+    { num: 4, label: 'Assessments' },
+    { num: 5, label: 'Review' },
+  ];
+
+  return (
+    <div className="bg-[#f4f7f6] min-h-screen p-4 md:p-8">
+      {/* Top Action Header Bar (Image 4) */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 pb-4 border-b border-gray-200">
+        <div>
+          <span className="font-sans text-[11px] font-bold text-[#0d5c63] tracking-widest uppercase">COURSE CREATOR</span>
+          <h1 className="font-display text-2xl md:text-3xl font-bold text-[#0e2a2a] mt-0.5">Small Animal Medicine</h1>
+        </div>
+
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => showToast('Preview mode launched.', 'info')}
+            className="px-5 py-2 rounded-full border border-gray-300 bg-white text-gray-700 font-sans text-sm font-semibold hover:bg-gray-50 transition-colors shadow-2xs"
+          >
+            Preview
+          </button>
+          <button
+            onClick={() => {
+              showToast('Course published successfully!', 'success');
+              if (onBack) onBack();
+            }}
+            className="px-6 py-2 rounded-full bg-[#0d5c63] hover:bg-[#09474d] text-white font-sans text-sm font-semibold transition-all shadow-xs flex items-center gap-2"
+          >
+            <span className="material-symbols-outlined text-[18px]">publish</span>
+            Publish
+          </button>
+        </div>
+      </div>
+
+      {/* 5-Step Stepper Bar (Image 4) */}
+      <div className="max-w-3xl mx-auto mb-10">
+        <div className="flex items-center justify-between relative">
+          {/* Connector Line */}
+          <div className="absolute left-8 right-8 top-4 h-0.5 bg-gray-200 z-0"></div>
+          
+          {steps.map((step) => {
+            const isCompleted = step.num < activeStep;
+            const isActive = step.num === activeStep;
+
+            return (
+              <div
+                key={step.num}
+                onClick={() => setActiveStep(step.num)}
+                className="flex flex-col items-center relative z-10 cursor-pointer group"
+              >
+                <div
+                  className={`w-9 h-9 rounded-full flex items-center justify-center font-sans text-xs font-bold transition-all ${
+                    isCompleted
+                      ? 'bg-[#0d5c63] text-white'
+                      : isActive
+                      ? 'bg-[#0d5c63] text-white ring-4 ring-[#0d5c63]/15'
+                      : 'bg-white border-2 border-gray-300 text-gray-500 group-hover:border-gray-400'
+                  }`}
+                >
+                  {isCompleted ? (
+                    <span className="material-symbols-outlined text-[18px]">check</span>
+                  ) : (
+                    step.num
+                  )}
+                </div>
+                <span className={`font-sans text-xs mt-2 font-medium ${isActive ? 'text-[#0d5c63] font-bold' : 'text-gray-500'}`}>
+                  {step.label}
+                </span>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Curriculum Structure Main Section (Image 4) */}
+      <div className="max-w-4xl mx-auto">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+          <div>
+            <h2 className="font-display text-lg font-bold text-gray-900">Curriculum Structure</h2>
+            <p className="font-sans text-xs text-gray-500 mt-0.5">Organize modules and lessons via drag-and-drop.</p>
+          </div>
+          <button
+            onClick={handleAddModule}
+            className="px-4 py-2 rounded-full border border-gray-300 bg-white text-gray-800 font-sans text-xs font-semibold hover:bg-gray-50 transition-colors shadow-2xs flex items-center gap-1.5 self-start sm:self-auto"
+          >
+            <span className="material-symbols-outlined text-[16px]">add</span> Add Module
+          </button>
+        </div>
+
+        {/* Module Accordions */}
+        <div className="space-y-4">
+          {modules.map((m) => {
+            const isExpanded = expandedModules[m.id];
+
+            return (
+              <div key={m.id} className="bg-white rounded-2xl border border-gray-200/80 shadow-xs overflow-hidden transition-all">
+                {/* Module Header Bar */}
+                <div
+                  onClick={() => toggleModule(m.id)}
+                  className="p-4 flex items-center justify-between cursor-pointer hover:bg-gray-50/80 transition-colors select-none"
+                >
+                  <div className="flex items-center gap-3">
+                    <span className="material-symbols-outlined text-gray-300 text-[20px]">drag_indicator</span>
+                    <span className="px-2.5 py-1 bg-cyan-100 text-cyan-900 font-sans text-xs font-bold rounded-md">
+                      {m.code}
+                    </span>
+                    <div>
+                      <h3 className="font-sans text-sm font-bold text-gray-900">{m.title}</h3>
+                      <p className="font-sans text-[11px] text-gray-400 font-medium">
+                        {m.lessonCount} Lessons • {m.assessmentCount} Assessment
+                      </p>
+                    </div>
+                  </div>
+
+                  <span className="material-symbols-outlined text-gray-400">
+                    {isExpanded ? 'expand_less' : 'expand_more'}
+                  </span>
+                </div>
+
+                {/* Module Lessons List (Expanded Content) */}
+                {isExpanded && (
+                  <div className="px-4 pb-4 pt-1 border-t border-gray-100 bg-gray-50/40 space-y-2">
+                    {m.lessons.map((lesson) => (
+                      <div
+                        key={lesson.id}
+                        className="bg-white p-3 rounded-xl border border-gray-200/70 shadow-2xs flex items-center justify-between hover:border-gray-300 transition-colors"
+                      >
+                        <div className="flex items-center gap-3">
+                          <span className="material-symbols-outlined text-gray-300 text-[18px]">drag_indicator</span>
+                          
+                          <div className="w-7 h-7 rounded-full bg-cyan-50 text-cyan-800 flex items-center justify-center shrink-0">
+                            <span className="material-symbols-outlined text-[16px]">
+                              {lesson.type === 'video' ? 'play_circle' : lesson.type === 'quiz' ? 'quiz' : 'menu_book'}
+                            </span>
+                          </div>
+
+                          <div>
+                            <h4 className="font-sans text-xs font-bold text-gray-900">{lesson.title}</h4>
+                            <p className="font-sans text-[11px] text-gray-400">{lesson.meta}</p>
+                          </div>
+                        </div>
+
+                        <button onClick={() => showToast('Lesson options opened.', 'info')} className="text-gray-400 hover:text-gray-600 p-1">
+                          <span className="material-symbols-outlined text-[18px]">more_vert</span>
+                        </button>
+                      </div>
+                    ))}
+
+                    {/* Inline Module Footer Actions */}
+                    <div className="flex items-center gap-4 pt-3 px-2">
+                      <button
+                        onClick={() => handleAddLesson(m.id)}
+                        className="text-[#0d5c63] font-sans text-xs font-bold hover:underline flex items-center gap-1"
+                      >
+                        <span className="material-symbols-outlined text-[16px]">add</span> Add Lesson
+                      </button>
+                      <button
+                        onClick={() => handleAddQuiz(m.id)}
+                        className="text-[#0d5c63] font-sans text-xs font-bold hover:underline flex items-center gap-1"
+                      >
+                        <span className="material-symbols-outlined text-[16px]">add</span> Add Quiz
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
 };
 
 // ─── Sub-views ────────────────────────────────────────────────────────────────
-
-const OverviewTab = ({ courses, showToast }) => {
-  const totalStudents = STUDENTS.length;
-  const activeStudents = STUDENTS.filter(s => s.status === 'Active').length;
-  const avgScore = Math.round(STUDENTS.reduce((a, s) => a + s.score, 0) / STUDENTS.length);
-  const completionRate = Math.round(STUDENTS.reduce((a, s) => a + s.progress, 0) / STUDENTS.length);
-  const atRisk = STUDENTS.filter(s => s.status === 'At Risk' || s.status === 'Inactive');
+const OverviewTab = ({ showToast }) => {
+  const totalStudents = '4,250';
+  const activeStudents = '1,840';
+  const completionRate = '72%';
+  const avgScore = '84%';
+  const atRisk = [
+    { id: 's1', initials: 'JD', name: 'Jane Doe', course: 'Surgery Basics', badge: 'At Risk' },
+    { id: 's2', initials: 'AS', name: 'Alex Smith', course: 'Internal Medicine', badge: 'At Risk' },
+    { id: 's3', initials: 'MW', name: 'Maria Garcia', course: 'Equine Anatomy', badge: 'Inactive' },
+  ];
 
   const metrics = [
-    { icon: 'group', bg: 'bg-primary-container', color: 'text-on-primary-container', label: 'Total Students', value: totalStudents, sub: '+5% this month', trend: true },
-    { icon: 'how_to_reg', bg: 'bg-secondary-container', color: 'text-on-secondary-container', label: 'Active Students', value: activeStudents, sub: 'Currently engaged', trend: false },
-    { icon: 'check_circle', bg: 'bg-primary-container', color: 'text-on-primary-container', label: 'Avg Completion', value: `${completionRate}%`, bar: completionRate },
-    { icon: 'school', bg: 'bg-primary-container', color: 'text-on-primary-container', label: 'Avg Assessment', value: `${avgScore}%`, sub: 'Across all courses', trend: false },
+    { icon: 'group', bg: 'bg-[#0d5c63]/10', color: 'text-[#0d5c63]', label: 'Total Students', value: totalStudents, sub: '+5% this month', trend: true },
+    { icon: 'person_apron', bg: 'bg-emerald-100', color: 'text-emerald-800', label: 'Active Students', value: activeStudents, sub: 'Currently engaged', trend: false },
+    { icon: 'check_circle', bg: 'bg-[#0d5c63]/10', color: 'text-[#0d5c63]', label: 'Completion Rate', value: completionRate, bar: 72 },
+    { icon: 'school', bg: 'bg-emerald-100', color: 'text-emerald-800', label: 'Avg Assessment', value: avgScore, sub: '+2% vs last term', trend: true },
+  ];
+
+  const coursePerformance = [
+    { id: 'cp1', name: 'Surgery Basics', instructor: 'Dr. E. Miller', enrollments: 420, status: 'Published' },
+    { id: 'cp2', name: 'Internal Medicine Advanced', instructor: 'Dr. S. Chen', enrollments: 315, status: 'Published' },
+    { id: 'cp3', name: 'Exotic Animal Care', instructor: 'Dr. J. Davis', enrollments: 150, status: 'Draft' },
+    { id: 'cp4', name: 'Veterinary Pharmacology', instructor: 'Dr. A. Patel', enrollments: 280, status: 'Published' },
   ];
 
   return (
     <div className="space-y-8">
-      {/* Metric cards */}
+      {/* Header section (Image 0 style) */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h1 className="font-display text-3xl font-bold text-[#0d5c63]">Dashboard Overview</h1>
+          <p className="font-sans text-sm text-gray-500 mt-1">
+            Welcome back, Dr. Aris. Here is the latest performance data across the institution.
+          </p>
+        </div>
+        <button
+          onClick={() => showToast('Institutional performance report generated!', 'success')}
+          className="px-5 py-2.5 rounded-xl border border-[#0d5c63] text-[#0d5c63] font-sans text-xs font-bold hover:bg-[#0d5c63]/5 transition-colors self-start sm:self-auto shadow-2xs"
+        >
+          Generate Report
+        </button>
+      </div>
+
+      {/* 4 Stat Metric cards (Image 0 style) */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {metrics.map(m => (
-          <div key={m.label} className="bg-white rounded-xl p-5 border border-outline-variant shadow-sm hover:border-primary hover:shadow-md transition-all">
+          <div key={m.label} className="bg-white rounded-2xl p-5 border border-gray-200/80 shadow-xs hover:border-[#0d5c63] hover:shadow-md transition-all">
             <div className="flex items-center gap-2 mb-3">
-              <div className={`p-2 ${m.bg} rounded-lg ${m.color}`}>
-                <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>{m.icon}</span>
+              <div className={`p-2 rounded-xl ${m.bg} ${m.color}`}>
+                <span className="material-symbols-outlined text-[20px]" style={{ fontVariationSettings: "'FILL' 1" }}>{m.icon}</span>
               </div>
-              <p className="font-sans text-sm text-on-surface-variant">{m.label}</p>
+              <p className="font-sans text-xs font-semibold text-gray-500">{m.label}</p>
             </div>
-            <p className="font-display text-3xl font-bold text-on-surface">{m.value}</p>
+            <p className="font-display text-3xl font-extrabold text-gray-900">{m.value}</p>
             {m.bar !== undefined && (
-              <div className="w-full h-1.5 bg-surface-variant rounded-full mt-3 overflow-hidden">
-                <div className="h-full bg-secondary rounded-full transition-all" style={{ width: `${m.bar}%` }} />
+              <div className="w-full h-1.5 bg-gray-100 rounded-full mt-3 overflow-hidden">
+                <div className="h-full bg-[#0d5c63] rounded-full transition-all duration-500" style={{ width: `${m.bar}%` }} />
               </div>
             )}
             {m.sub && (
-              <p className={`font-sans text-xs mt-1 flex items-center gap-1 ${m.trend ? 'text-secondary' : 'text-on-surface-variant'}`}>
-                {m.trend && <span className="material-symbols-outlined text-[14px]">trending_up</span>}
+              <p className={`font-sans text-[11px] mt-1.5 flex items-center gap-1 font-semibold ${m.trend ? 'text-emerald-700' : 'text-gray-500'}`}>
+                {m.trend && <span className="material-symbols-outlined text-[13px]">trending_up</span>}
                 {m.sub}
               </p>
             )}
@@ -67,86 +352,151 @@ const OverviewTab = ({ courses, showToast }) => {
         ))}
       </div>
 
-      {/* Analytics + At-Risk */}
+      {/* Actionable Analytics & Attention Needed Grid (Image 0 style) */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 bg-white rounded-xl border border-outline-variant shadow-sm p-6">
-          <h2 className="font-display text-xl font-bold text-on-surface mb-4 flex items-center gap-2">
-            <span className="material-symbols-outlined text-primary">insights</span> Actionable Analytics
+        {/* Left: Actionable Analytics */}
+        <div className="lg:col-span-2 bg-white rounded-2xl border border-gray-200/80 shadow-xs p-6">
+          <h2 className="font-display text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+            <span className="material-symbols-outlined text-[#0d5c63] text-[20px]">insights</span> Actionable Analytics
           </h2>
           <div className="space-y-4">
-            <div className="flex gap-4 p-4 bg-error-container/20 rounded-xl border border-error/20">
-              <span className="material-symbols-outlined text-error mt-0.5" style={{ fontVariationSettings: "'FILL' 1" }}>warning</span>
+            <div className="flex gap-4 p-4 bg-red-50/70 rounded-2xl border border-red-100/80">
+              <span className="material-symbols-outlined text-red-600 mt-0.5" style={{ fontVariationSettings: "'FILL' 1" }}>warning</span>
               <div>
-                <p className="font-sans text-sm font-medium text-on-surface">23% of students drop off in Module 3 of Surgery Basics</p>
-                <p className="font-sans text-xs text-on-surface-variant mt-1">Suggested: Review video clarity and split assessment into smaller parts.</p>
-                <button onClick={() => showToast('Module content review opened.', 'info')} className="mt-2 text-primary font-sans text-sm hover:underline">Review Module Content →</button>
+                <p className="font-sans text-xs font-bold text-gray-900">23% of students drop off during Module 3 of Surgery Basics</p>
+                <p className="font-sans text-[11px] text-gray-600 mt-1">Suggested Action: Review video lecture clarity and split assessment into smaller parts.</p>
+                <button onClick={() => showToast('Module content review opened.', 'info')} className="mt-2 text-[#0d5c63] font-sans text-xs font-bold hover:underline">
+                  Review Module Content
+                </button>
               </div>
             </div>
-            <div className="flex gap-4 p-4 bg-surface-container rounded-xl border border-outline-variant">
-              <span className="material-symbols-outlined text-on-surface-variant mt-0.5" style={{ fontVariationSettings: "'FILL' 1" }}>trending_down</span>
+
+            <div className="flex gap-4 p-4 bg-gray-50 rounded-2xl border border-gray-200/70">
+              <span className="material-symbols-outlined text-gray-600 mt-0.5">trending_down</span>
               <div>
-                <p className="font-sans text-sm font-medium text-on-surface">Assessment performance dropped 12% in Internal Medicine</p>
-                <p className="font-sans text-xs text-on-surface-variant mt-1">Recent cohort scored lower on the 'Canine Cardiology' section.</p>
-                <button onClick={() => showToast('Detailed score report opened.', 'info')} className="mt-2 text-primary font-sans text-sm hover:underline">View Detailed Scores →</button>
-              </div>
-            </div>
-            <div className="flex gap-4 p-4 bg-secondary-container/20 rounded-xl border border-secondary/20">
-              <span className="material-symbols-outlined text-secondary mt-0.5" style={{ fontVariationSettings: "'FILL' 1" }}>emoji_events</span>
-              <div>
-                <p className="font-sans text-sm font-medium text-on-surface">2 students completed all modules this week</p>
-                <p className="font-sans text-xs text-on-surface-variant mt-1">Ravi Kumar and Carlos Herrera are ready for certification.</p>
-                <button onClick={() => showToast('Certificate generation coming soon!', 'success')} className="mt-2 text-primary font-sans text-sm hover:underline">Generate Certificates →</button>
+                <p className="font-sans text-xs font-bold text-gray-900">Assessment performance dropped by 12% in Internal Medicine</p>
+                <p className="font-sans text-[11px] text-gray-600 mt-1">Recent cohort scored lower on 'Canine Cardiology' section.</p>
+                <button onClick={() => showToast('Detailed score report opened.', 'info')} className="mt-2 text-[#0d5c63] font-sans text-xs font-bold hover:underline">
+                  View Detailed Scores
+                </button>
               </div>
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-xl border border-outline-variant shadow-sm p-6 flex flex-col">
-          <h2 className="font-display text-xl font-bold text-on-surface mb-4 flex items-center gap-2">
-            <span className="material-symbols-outlined text-error">assignment_late</span> Attention Needed
-          </h2>
-          <ul className="flex-1 space-y-2">
-            {atRisk.map(s => (
-              <li key={s.id} className="flex items-center justify-between p-2.5 hover:bg-surface-container rounded-xl transition-colors border border-transparent hover:border-outline-variant">
-                <div className="flex items-center gap-2.5">
-                  <div className="w-8 h-8 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center font-bold text-xs shrink-0">{s.initials}</div>
-                  <div>
-                    <p className="font-sans text-sm font-semibold text-on-surface">{s.name}</p>
-                    <p className="font-sans text-xs text-on-surface-variant">{s.progress}% progress</p>
+        {/* Right: Attention Needed */}
+        <div className="bg-white rounded-2xl border border-gray-200/80 shadow-xs p-6 flex flex-col justify-between">
+          <div>
+            <h2 className="font-display text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+              <span className="material-symbols-outlined text-red-500 text-[20px]">assignment_late</span> Attention Needed
+            </h2>
+            <ul className="space-y-3">
+              {atRisk.map(s => (
+                <li key={s.id} className="flex items-center justify-between p-2 hover:bg-gray-50 rounded-xl transition-colors">
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-full bg-[#0d5c63] text-white flex items-center justify-center font-bold text-xs shrink-0">
+                      {s.initials}
+                    </div>
+                    <div>
+                      <p className="font-sans text-xs font-bold text-gray-900">{s.name}</p>
+                      <p className="font-sans text-[10px] text-gray-500">{s.course}</p>
+                    </div>
                   </div>
-                </div>
-                <span className={`${BADGE_STYLES[s.badge]} px-2 py-1 rounded-lg font-sans text-xs font-bold`}>{s.badge}</span>
-              </li>
-            ))}
-          </ul>
-          <button onClick={() => showToast('Sending nudge emails to at-risk students...', 'success')} className="mt-4 w-full py-2.5 border border-primary text-primary rounded-xl font-sans text-sm hover:bg-primary-container transition-colors">
-            Send Nudge to All At-Risk
+                  <span className={`${BADGE_STYLES[s.badge]} px-2 py-0.5 rounded-md font-sans text-[10px] font-bold`}>
+                    {s.badge}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <button
+            onClick={() => showToast('Roster filtered to all at-risk students.', 'info')}
+            className="mt-4 w-full py-2 border border-gray-300 text-gray-700 rounded-xl font-sans text-xs font-bold hover:bg-gray-50 transition-colors shadow-2xs"
+          >
+            View All Students
           </button>
+        </div>
+      </div>
+
+      {/* Course Performance Table (Image 1 style) */}
+      <div className="bg-white rounded-2xl border border-gray-200/80 shadow-xs overflow-hidden">
+        <div className="p-5 border-b border-gray-200/70 flex items-center justify-between">
+          <h2 className="font-display text-lg font-bold text-gray-900">Course Performance</h2>
+          <button
+            onClick={() => showToast('Course performance filters opened.', 'info')}
+            className="px-3.5 py-1.5 rounded-xl border border-gray-200 text-gray-700 font-sans text-xs font-semibold hover:bg-gray-50 transition-colors flex items-center gap-1.5"
+          >
+            <span className="material-symbols-outlined text-[16px]">filter_list</span> Filter
+          </button>
+        </div>
+
+        <div className="overflow-x-auto">
+          <table className="w-full font-sans text-xs text-left">
+            <thead>
+              <tr className="bg-gray-50 text-gray-500 uppercase tracking-wider border-b border-gray-200 text-[10px]">
+                <th className="p-4 font-bold">COURSE NAME</th>
+                <th className="p-4 font-bold">INSTRUCTOR</th>
+                <th className="p-4 font-bold">ENROLLMENTS</th>
+                <th className="p-4 font-bold">STATUS</th>
+                <th className="p-4 font-bold text-right">ACTIONS</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-100">
+              {coursePerformance.map(c => (
+                <tr key={c.id} className="hover:bg-gray-50/60 transition-colors">
+                  <td className="p-4 font-bold text-gray-900">{c.name}</td>
+                  <td className="p-4 text-gray-600">{c.instructor}</td>
+                  <td className="p-4 text-gray-900 font-bold">{c.enrollments}</td>
+                  <td className="p-4">
+                    <span className={`px-2.5 py-0.5 rounded-md text-[10px] font-bold ${
+                      c.status === 'Published'
+                        ? 'bg-emerald-100 text-emerald-800'
+                        : 'bg-gray-200 text-gray-700'
+                    }`}>
+                      {c.status}
+                    </span>
+                  </td>
+                  <td className="p-4 text-right">
+                    <button
+                      onClick={() => showToast(`Options for "${c.name}" opened.`, 'info')}
+                      className="p-1 text-gray-400 hover:text-gray-600 rounded-md"
+                    >
+                      <span className="material-symbols-outlined text-[18px]">more_vert</span>
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </div>
     </div>
   );
 };
 
-const CoursesTab = ({ courses, showToast }) => {
+const CoursesTab = ({ courses, showToast, onEditCourse }) => {
   const [search, setSearch] = useState('');
   const filtered = courses.filter(c => c.title.toLowerCase().includes(search.toLowerCase()));
 
   return (
-    <div className="bg-white rounded-xl border border-outline-variant shadow-sm overflow-hidden">
-      <div className="p-5 border-b border-outline-variant flex flex-col sm:flex-row sm:items-center gap-3 justify-between">
-        <h2 className="font-display text-xl font-bold text-on-surface">Course Management</h2>
+    <div className="bg-white rounded-2xl border border-gray-200/80 shadow-xs overflow-hidden">
+      <div className="p-5 border-b border-gray-200/70 flex flex-col sm:flex-row sm:items-center gap-3 justify-between">
+        <h2 className="font-display text-xl font-bold text-gray-900">Course Management</h2>
         <div className="flex gap-2 items-center">
           <div className="relative">
-            <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-[18px]">search</span>
+            <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-[18px]">search</span>
             <input
               value={search}
               onChange={e => setSearch(e.target.value)}
-              className="pl-9 pr-4 py-2 rounded-lg border border-outline-variant text-sm font-sans focus:outline-none focus:border-primary bg-surface-container-lowest"
+              className="pl-9 pr-4 py-2 rounded-xl border border-gray-200 text-sm font-sans focus:outline-none focus:border-[#0d5c63] bg-gray-50/50"
               placeholder="Search courses..."
             />
           </div>
-          <button onClick={() => showToast('Course creation wizard coming soon!', 'info')} className="px-4 py-2 bg-primary text-on-primary rounded-lg font-sans text-sm font-bold hover:opacity-90 transition-opacity flex items-center gap-1 shrink-0">
+          <button
+            onClick={onEditCourse}
+            className="px-4 py-2 bg-[#0d5c63] text-white rounded-xl font-sans text-sm font-bold hover:bg-[#09474d] transition-colors flex items-center gap-1 shrink-0 shadow-2xs"
+          >
             <span className="material-symbols-outlined text-[18px]">add</span> New Course
           </button>
         </div>
@@ -154,39 +504,42 @@ const CoursesTab = ({ courses, showToast }) => {
       <div className="overflow-x-auto">
         <table className="w-full font-sans text-sm text-left">
           <thead>
-            <tr className="bg-surface-container-low text-on-surface-variant text-xs uppercase tracking-wider border-b border-outline-variant">
+            <tr className="bg-gray-50 text-gray-500 text-xs uppercase tracking-wider border-b border-gray-200">
               <th className="p-4 font-semibold">Course</th>
               <th className="p-4 font-semibold">Instructor</th>
               <th className="p-4 font-semibold">Students</th>
               <th className="p-4 font-semibold">Modules</th>
-              <th className="p-4 font-semibold">Level</th>
               <th className="p-4 font-semibold text-right">Actions</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-outline-variant/50">
+          <tbody className="divide-y divide-gray-100">
             {filtered.map(c => (
-              <tr key={c.id} className="hover:bg-surface-container-lowest transition-colors">
+              <tr key={c.id} className="hover:bg-gray-50/60 transition-colors">
                 <td className="p-4">
                   <div className="flex items-center gap-3">
-                    <img src={c.image} alt={c.title} className="w-10 h-10 rounded-lg object-cover shrink-0" />
+                    <img src={c.image} alt={c.title} className="w-10 h-10 rounded-lg object-cover shrink-0 border border-gray-200" />
                     <div>
-                      <p className="font-medium text-on-surface">{c.title}</p>
-                      <p className="text-xs text-on-surface-variant">{c.tag}</p>
+                      <p className="font-bold text-gray-900">{c.title}</p>
+                      <p className="text-xs text-gray-500">{c.tag}</p>
                     </div>
                   </div>
                 </td>
-                <td className="p-4 text-on-surface-variant">{c.instructor}</td>
-                <td className="p-4 text-on-surface">{c.students}</td>
-                <td className="p-4 text-on-surface">{c.modules.length}</td>
-                <td className="p-4">
-                  <span className={`${c.tagBg} px-2.5 py-1 rounded-lg text-xs font-bold`}>{c.level}</span>
-                </td>
+                <td className="p-4 text-gray-600">{c.instructor}</td>
+                <td className="p-4 text-gray-900 font-semibold">{c.students}</td>
+                <td className="p-4 text-gray-900">{c.modules.length}</td>
                 <td className="p-4 text-right">
                   <div className="flex items-center justify-end gap-1">
-                    <button onClick={() => showToast(`Editing "${c.title}"...`, 'info')} className="p-1.5 text-on-surface-variant hover:text-primary hover:bg-primary-container/30 rounded-lg transition-colors">
+                    <button
+                      onClick={onEditCourse}
+                      className="p-2 text-gray-500 hover:text-[#0d5c63] hover:bg-[#0d5c63]/10 rounded-lg transition-colors"
+                      title="Open Course Creator"
+                    >
                       <span className="material-symbols-outlined text-[18px]">edit</span>
                     </button>
-                    <button onClick={() => showToast(`Analytics for "${c.title}" opening...`, 'info')} className="p-1.5 text-on-surface-variant hover:text-primary hover:bg-primary-container/30 rounded-lg transition-colors">
+                    <button
+                      onClick={() => showToast(`Analytics for "${c.title}" opening...`, 'info')}
+                      className="p-2 text-gray-500 hover:text-[#0d5c63] hover:bg-[#0d5c63]/10 rounded-lg transition-colors"
+                    >
                       <span className="material-symbols-outlined text-[18px]">analytics</span>
                     </button>
                   </div>
@@ -195,101 +548,402 @@ const CoursesTab = ({ courses, showToast }) => {
             ))}
           </tbody>
         </table>
-        {filtered.length === 0 && (
-          <div className="py-16 text-center text-on-surface-variant font-sans text-sm">No courses found.</div>
-        )}
       </div>
     </div>
   );
 };
 
 const StudentsTab = ({ showToast }) => {
-  const [search, setSearch] = useState('');
-  const [statusFilter, setStatusFilter] = useState('All');
-  const filtered = STUDENTS.filter(s =>
-    s.name.toLowerCase().includes(search.toLowerCase()) &&
-    (statusFilter === 'All' || s.status === statusFilter)
-  );
-
   return (
-    <div className="bg-white rounded-xl border border-outline-variant shadow-sm overflow-hidden">
-      <div className="p-5 border-b border-outline-variant flex flex-col sm:flex-row gap-3 justify-between items-start sm:items-center">
-        <h2 className="font-display text-xl font-bold text-on-surface">Student Roster</h2>
-        <div className="flex gap-2 flex-wrap">
-          <div className="relative">
-            <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-[18px]">search</span>
-            <input
-              value={search}
-              onChange={e => setSearch(e.target.value)}
-              className="pl-9 pr-4 py-2 rounded-lg border border-outline-variant text-sm font-sans focus:outline-none focus:border-primary bg-surface-container-lowest"
-              placeholder="Search students..."
-            />
-          </div>
-          <select
-            value={statusFilter}
-            onChange={e => setStatusFilter(e.target.value)}
-            className="px-3 py-2 rounded-lg border border-outline-variant text-sm font-sans focus:outline-none focus:border-primary bg-surface-container-lowest text-on-surface"
-          >
-            {['All', 'Active', 'At Risk', 'Inactive', 'Completed'].map(s => <option key={s}>{s}</option>)}
-          </select>
-        </div>
-      </div>
+    <div className="bg-white rounded-2xl border border-gray-200/80 shadow-xs overflow-hidden p-6">
+      <h2 className="font-display text-xl font-bold text-gray-900 mb-4">Student Roster</h2>
       <div className="overflow-x-auto">
         <table className="w-full font-sans text-sm text-left">
           <thead>
-            <tr className="bg-surface-container-low text-on-surface-variant text-xs uppercase tracking-wider border-b border-outline-variant">
+            <tr className="bg-gray-50 text-gray-500 text-xs uppercase border-b border-gray-200">
               <th className="p-4 font-semibold">Student</th>
               <th className="p-4 font-semibold">Current Course</th>
               <th className="p-4 font-semibold">Progress</th>
-              <th className="p-4 font-semibold">Avg Score</th>
               <th className="p-4 font-semibold">Status</th>
-              <th className="p-4 font-semibold text-right">Actions</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-outline-variant/50">
-            {filtered.map(s => (
-              <tr key={s.id} className="hover:bg-surface-container-lowest transition-colors">
+          <tbody className="divide-y divide-gray-100">
+            {STUDENTS.map(s => (
+              <tr key={s.id}>
+                <td className="p-4 font-bold text-gray-900">{s.name}</td>
+                <td className="p-4 text-gray-600">{s.course}</td>
+                <td className="p-4 text-[#0d5c63] font-bold">{s.progress}%</td>
                 <td className="p-4">
-                  <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center font-bold text-sm shrink-0">{s.initials}</div>
-                    <div>
-                      <p className="font-medium text-on-surface">{s.name}</p>
-                      <p className="text-xs text-on-surface-variant">{s.email}</p>
-                    </div>
-                  </div>
-                </td>
-                <td className="p-4 text-on-surface-variant max-w-[160px] truncate">{s.course}</td>
-                <td className="p-4">
-                  <div className="flex items-center gap-2">
-                    <div className="w-20 h-1.5 bg-surface-container-high rounded-full overflow-hidden">
-                      <div className="h-full bg-secondary rounded-full" style={{ width: `${s.progress}%` }} />
-                    </div>
-                    <span className="text-xs text-on-surface-variant">{s.progress}%</span>
-                  </div>
-                </td>
-                <td className="p-4">
-                  <span className={`font-bold ${s.score >= 80 ? 'text-secondary' : s.score >= 60 ? 'text-on-surface' : 'text-error'}`}>{s.score}%</span>
-                </td>
-                <td className="p-4">
-                  <span className={`${BADGE_STYLES[s.badge]} px-2.5 py-1 rounded-lg text-xs font-bold`}>{s.badge}</span>
-                </td>
-                <td className="p-4 text-right">
-                  <div className="flex items-center justify-end gap-1">
-                    <button onClick={() => showToast(`Viewing ${s.name}'s full profile...`, 'info')} className="p-1.5 text-on-surface-variant hover:text-primary hover:bg-primary-container/30 rounded-lg transition-colors">
-                      <span className="material-symbols-outlined text-[18px]">person</span>
-                    </button>
-                    <button onClick={() => showToast(`Nudge email sent to ${s.name}!`, 'success')} className="p-1.5 text-on-surface-variant hover:text-primary hover:bg-primary-container/30 rounded-lg transition-colors">
-                      <span className="material-symbols-outlined text-[18px]">mail</span>
-                    </button>
-                  </div>
+                  <span className={`${BADGE_STYLES[s.badge]} px-2 py-0.5 rounded-md text-xs font-bold`}>{s.badge}</span>
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
-        {filtered.length === 0 && (
-          <div className="py-16 text-center text-on-surface-variant font-sans text-sm">No students match your filters.</div>
+      </div>
+    </div>
+  );
+};
+
+// ─── Analytics Tab Component ──────────────────────────────────────────────────
+const AnalyticsTab = ({ showToast }) => {
+  const [timeframe, setTimeframe] = useState('Last 30 Days');
+
+  const analyticsMetrics = [
+    { label: 'Total Watch Time', value: '1,420 hrs', change: '+18.4%', isPositive: true, icon: 'schedule', color: 'text-[#0d5c63]', bg: 'bg-[#0d5c63]/10' },
+    { label: 'Avg Completion Rate', value: '78.2%', change: '+5.1%', isPositive: true, icon: 'pie_chart', color: 'text-emerald-800', bg: 'bg-emerald-100' },
+    { label: 'Quiz Submissions', value: '8,940', change: '86.5% Pass Rate', isPositive: true, icon: 'quiz', color: 'text-cyan-800', bg: 'bg-cyan-100' },
+    { label: 'Student Rating', value: '4.9 / 5.0', change: '1,240 Reviews', isPositive: true, icon: 'star', color: 'text-amber-700', bg: 'bg-amber-100' },
+  ];
+
+  const weeklyData = [
+    { day: 'Mon', views: 420, height: '65%' },
+    { day: 'Tue', views: 680, height: '85%' },
+    { day: 'Wed', views: 890, height: '100%' },
+    { day: 'Thu', views: 750, height: '90%' },
+    { day: 'Fri', views: 530, height: '70%' },
+    { day: 'Sat', views: 310, height: '45%' },
+    { day: 'Sun', views: 240, height: '35%' },
+  ];
+
+  const moduleDropOff = [
+    { module: 'Module 1: Foundations of Clinical Care', completion: 94, dropOff: '6%', status: 'Optimal' },
+    { module: 'Module 2: Diagnostics & Imaging', completion: 88, dropOff: '12%', status: 'Optimal' },
+    { module: 'Module 3: Cardiology Pattern Analysis', completion: 72, dropOff: '28%', status: 'Attention Needed' },
+    { module: 'Module 4: Soft Tissue Surgical Protocols', completion: 89, dropOff: '11%', status: 'Optimal' },
+  ];
+
+  const topLessons = [
+    { title: '1.2 Diagnostic Radiography & Thoracic Views', views: '1,820', rating: 4.9, category: 'Imaging' },
+    { title: '3.1 EKG Pattern Analysis & Arrythmia', views: '1,450', rating: 4.8, category: 'Cardiology' },
+    { title: '2.4 Renal Pathology & CBC Interpretation', views: '1,210', rating: 5.0, category: 'Diagnostics' },
+  ];
+
+  return (
+    <div className="space-y-8">
+      {/* Header Bar & Timeframe Selector */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h2 className="font-display text-2xl font-bold text-gray-900">Creator Analytics</h2>
+          <p className="font-sans text-xs text-gray-500 mt-0.5">Track student engagement, completion rates, and content performance.</p>
+        </div>
+
+        <div className="flex items-center gap-3">
+          <select
+            value={timeframe}
+            onChange={e => {
+              setTimeframe(e.target.value);
+              showToast(`Analytics filtered for ${e.target.value}`, 'info');
+            }}
+            className="bg-white border border-gray-200 text-xs font-sans font-bold text-gray-800 rounded-xl px-3 py-2 focus:outline-none focus:border-[#0d5c63]"
+          >
+            <option>Last 7 Days</option>
+            <option>Last 30 Days</option>
+            <option>Last 90 Days</option>
+            <option>All Time</option>
+          </select>
+          <button
+            onClick={() => showToast('Exporting analytics CSV report...', 'success')}
+            className="px-4 py-2 bg-[#0d5c63] text-white rounded-xl font-sans text-xs font-bold hover:bg-[#09474d] transition-colors flex items-center gap-1.5 shadow-2xs"
+          >
+            <span className="material-symbols-outlined text-[16px]">download</span> Export CSV
+          </button>
+        </div>
+      </div>
+
+      {/* 4 Stat Metric Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {analyticsMetrics.map(m => (
+          <div key={m.label} className="bg-white rounded-2xl p-5 border border-gray-200/80 shadow-2xs hover:shadow-md transition-all">
+            <div className="flex items-center gap-2.5 mb-3">
+              <div className={`p-2 rounded-xl ${m.bg} ${m.color}`}>
+                <span className="material-symbols-outlined text-[20px]" style={{ fontVariationSettings: "'FILL' 1" }}>{m.icon}</span>
+              </div>
+              <span className="font-sans text-xs font-bold text-gray-500">{m.label}</span>
+            </div>
+            <p className="font-display text-2xl font-extrabold text-gray-900">{m.value}</p>
+            <span className="font-sans text-[11px] font-semibold text-emerald-700 mt-1 block flex items-center gap-1">
+              <span className="material-symbols-outlined text-[12px]">trending_up</span> {m.change}
+            </span>
+          </div>
+        ))}
+      </div>
+
+      {/* Bar Chart & Top Lessons Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Left: Weekly Active Engagement Bar Chart */}
+        <div className="lg:col-span-2 bg-white rounded-2xl border border-gray-200/80 shadow-2xs p-6 flex flex-col justify-between">
+          <div className="flex justify-between items-center mb-6">
+            <div>
+              <h3 className="font-display text-base font-bold text-gray-900">Student Activity & Video Views</h3>
+              <p className="font-sans text-xs text-gray-400 mt-0.5">Daily active video views for the current week</p>
+            </div>
+            <span className="font-sans text-xs font-bold text-[#0d5c63] bg-[#0d5c63]/10 px-3 py-1 rounded-full">
+              Peak: Wednesday (890 views)
+            </span>
+          </div>
+
+          {/* Bar Chart Graphics */}
+          <div className="h-48 flex items-end justify-between gap-3 pt-6 pb-2 border-b border-gray-100 px-4">
+            {weeklyData.map(d => (
+              <div key={d.day} className="flex-1 flex flex-col items-center gap-2 group h-full justify-end">
+                <span className="font-sans text-[10px] font-bold text-[#0d5c63] opacity-0 group-hover:opacity-100 transition-opacity">
+                  {d.views}
+                </span>
+                <div
+                  className="w-full max-w-[36px] bg-[#0d5c63] group-hover:bg-emerald-600 rounded-t-xl transition-all duration-300"
+                  style={{ height: d.height }}
+                ></div>
+                <span className="font-sans text-xs font-semibold text-gray-500">{d.day}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Right: Top Performing Lessons */}
+        <div className="bg-white rounded-2xl border border-gray-200/80 shadow-2xs p-6">
+          <h3 className="font-display text-base font-bold text-gray-900 mb-4">Top Performing Lessons</h3>
+          <div className="space-y-4">
+            {topLessons.map((l, i) => (
+              <div key={l.title} className="p-3 bg-gray-50 rounded-xl border border-gray-200/70 space-y-1">
+                <div className="flex justify-between items-center">
+                  <span className="font-sans text-[10px] font-bold text-[#0d5c63] uppercase">{l.category}</span>
+                  <span className="font-sans text-xs font-bold text-amber-600 flex items-center gap-0.5">
+                    <span className="material-symbols-outlined text-[13px]" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
+                    {l.rating.toFixed(1)}
+                  </span>
+                </div>
+                <h4 className="font-sans text-xs font-bold text-gray-900 truncate">{l.title}</h4>
+                <p className="font-sans text-[11px] text-gray-500">{l.views} Total Views</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Module Completion & Drop-Off Analysis Table */}
+      <div className="bg-white rounded-2xl border border-gray-200/80 shadow-2xs overflow-hidden">
+        <div className="p-5 border-b border-gray-200/70">
+          <h3 className="font-display text-base font-bold text-gray-900">Curriculum Retention & Drop-Off Analysis</h3>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full font-sans text-xs text-left">
+            <thead>
+              <tr className="bg-gray-50 text-gray-500 uppercase tracking-wider text-[10px] border-b border-gray-200">
+                <th className="p-4 font-bold">MODULE TITLE</th>
+                <th className="p-4 font-bold">COMPLETION RATE</th>
+                <th className="p-4 font-bold">DROP-OFF RATE</th>
+                <th className="p-4 font-bold">STATUS</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-100">
+              {moduleDropOff.map(row => (
+                <tr key={row.module} className="hover:bg-gray-50/60 transition-colors">
+                  <td className="p-4 font-bold text-gray-900">{row.module}</td>
+                  <td className="p-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-24 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                        <div className="h-full bg-[#0d5c63] rounded-full" style={{ width: `${row.completion}%` }}></div>
+                      </div>
+                      <span className="font-bold text-gray-900">{row.completion}%</span>
+                    </div>
+                  </td>
+                  <td className="p-4 font-bold text-gray-700">{row.dropOff}</td>
+                  <td className="p-4">
+                    <span className={`px-2.5 py-0.5 rounded-md text-[10px] font-bold ${
+                      row.status === 'Optimal' ? 'bg-emerald-100 text-emerald-800' : 'bg-red-100 text-red-700'
+                    }`}>
+                      {row.status}
+                    </span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// ─── Settings Tab Component ───────────────────────────────────────────────────
+const SettingsTab = ({ showToast }) => {
+  const [settings, setSettings] = useState({
+    instructorName: 'Dr. Sarah Jenkins, DVM, DACVIM',
+    institution: 'Vetora Academy of Veterinary Medicine',
+    email: 's.jenkins@vetora.edu',
+    passingGrade: 80,
+    autoCertificates: true,
+    aiAssistant: true,
+    emailAlerts: true,
+    weeklyReport: true,
+  });
+
+  const [activeSubTab, setActiveSubTab] = useState('Profile & Branding');
+
+  return (
+    <div className="space-y-8 max-w-5xl">
+      <div>
+        <h2 className="font-display text-2xl font-bold text-gray-900">Creator & Institution Settings</h2>
+        <p className="font-sans text-xs text-gray-500 mt-0.5">Manage instructor profile, course publishing rules, and system notifications.</p>
+      </div>
+
+      {/* Sub Tab Navigation */}
+      <div className="flex gap-4 border-b border-gray-200 pb-2">
+        {['Profile & Branding', 'Curriculum Rules', 'Notifications'].map(sub => (
+          <button
+            key={sub}
+            onClick={() => setActiveSubTab(sub)}
+            className={`font-sans text-xs font-bold py-2 px-3 rounded-xl transition-all ${
+              activeSubTab === sub ? 'bg-[#0d5c63] text-white' : 'text-gray-600 hover:bg-gray-100'
+            }`}
+          >
+            {sub}
+          </button>
+        ))}
+      </div>
+
+      {/* Tab Content Box */}
+      <div className="bg-white rounded-2xl border border-gray-200/80 p-6 md:p-8 shadow-2xs space-y-6">
+        {activeSubTab === 'Profile & Branding' && (
+          <div className="space-y-5">
+            <h3 className="font-display text-lg font-bold text-gray-900 border-b border-gray-100 pb-3">Instructor Profile</h3>
+            
+            <div className="flex items-center gap-4">
+              <img
+                src="https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=150&auto=format&fit=crop&q=80"
+                alt="Avatar"
+                className="w-16 h-16 rounded-full object-cover border-2 border-[#0d5c63]"
+              />
+              <button
+                onClick={() => showToast('Avatar upload initialized.', 'info')}
+                className="px-4 py-2 border border-gray-300 rounded-xl text-xs font-sans font-bold text-gray-700 hover:bg-gray-50"
+              >
+                Change Avatar
+              </button>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block font-sans text-xs font-bold text-gray-700 mb-1">Full Name & Title</label>
+                <input
+                  type="text"
+                  value={settings.instructorName}
+                  onChange={e => setSettings(s => ({ ...s, instructorName: e.target.value }))}
+                  className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl font-sans text-xs text-gray-900 focus:outline-none focus:border-[#0d5c63]"
+                />
+              </div>
+
+              <div>
+                <label className="block font-sans text-xs font-bold text-gray-700 mb-1">Institution / Department</label>
+                <input
+                  type="text"
+                  value={settings.institution}
+                  onChange={e => setSettings(s => ({ ...s, institution: e.target.value }))}
+                  className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl font-sans text-xs text-gray-900 focus:outline-none focus:border-[#0d5c63]"
+                />
+              </div>
+
+              <div>
+                <label className="block font-sans text-xs font-bold text-gray-700 mb-1">Contact Email</label>
+                <input
+                  type="email"
+                  value={settings.email}
+                  onChange={e => setSettings(s => ({ ...s, email: e.target.value }))}
+                  className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl font-sans text-xs text-gray-900 focus:outline-none focus:border-[#0d5c63]"
+                />
+              </div>
+            </div>
+          </div>
         )}
+
+        {activeSubTab === 'Curriculum Rules' && (
+          <div className="space-y-6">
+            <h3 className="font-display text-lg font-bold text-gray-900 border-b border-gray-100 pb-3">Academic & Grading Standards</h3>
+
+            <div>
+              <label className="block font-sans text-xs font-bold text-gray-700 mb-1">Minimum Passing Quiz Score (%): {settings.passingGrade}%</label>
+              <input
+                type="range"
+                min="60"
+                max="100"
+                value={settings.passingGrade}
+                onChange={e => setSettings(s => ({ ...s, passingGrade: Number(e.target.value) }))}
+                className="w-full accent-[#0d5c63]"
+              />
+            </div>
+
+            <div className="space-y-4 pt-2">
+              <label className="flex items-center justify-between cursor-pointer p-3 bg-gray-50 rounded-xl border border-gray-200">
+                <div>
+                  <span className="font-sans text-xs font-bold text-gray-900 block">Auto-Issue RACE CE Certificates</span>
+                  <span className="font-sans text-[11px] text-gray-500">Automatically generate verified PDF certificates upon 100% course completion.</span>
+                </div>
+                <input
+                  type="checkbox"
+                  checked={settings.autoCertificates}
+                  onChange={e => setSettings(s => ({ ...s, autoCertificates: e.target.checked }))}
+                  className="w-4 h-4 text-[#0d5c63] rounded border-gray-300 focus:ring-[#0d5c63]"
+                />
+              </label>
+
+              <label className="flex items-center justify-between cursor-pointer p-3 bg-gray-50 rounded-xl border border-gray-200">
+                <div>
+                  <span className="font-sans text-xs font-bold text-gray-900 block">Vetora AI Student Assistant</span>
+                  <span className="font-sans text-[11px] text-gray-500">Allow AI chatbot to answer student questions based on course transcript data.</span>
+                </div>
+                <input
+                  type="checkbox"
+                  checked={settings.aiAssistant}
+                  onChange={e => setSettings(s => ({ ...s, aiAssistant: e.target.checked }))}
+                  className="w-4 h-4 text-[#0d5c63] rounded border-gray-300 focus:ring-[#0d5c63]"
+                />
+              </label>
+            </div>
+          </div>
+        )}
+
+        {activeSubTab === 'Notifications' && (
+          <div className="space-y-4">
+            <h3 className="font-display text-lg font-bold text-gray-900 border-b border-gray-100 pb-3">Notification Preferences</h3>
+
+            <label className="flex items-center justify-between cursor-pointer p-3 bg-gray-50 rounded-xl border border-gray-200">
+              <div>
+                <span className="font-sans text-xs font-bold text-gray-900 block">Student Case Submission Alerts</span>
+                <span className="font-sans text-[11px] text-gray-500">Receive email notification when a student submits a clinical case for review.</span>
+              </div>
+              <input
+                type="checkbox"
+                checked={settings.emailAlerts}
+                onChange={e => setSettings(s => ({ ...s, emailAlerts: e.target.checked }))}
+                className="w-4 h-4 text-[#0d5c63] rounded border-gray-300 focus:ring-[#0d5c63]"
+              />
+            </label>
+
+            <label className="flex items-center justify-between cursor-pointer p-3 bg-gray-50 rounded-xl border border-gray-200">
+              <div>
+                <span className="font-sans text-xs font-bold text-gray-900 block">Weekly Performance Digest</span>
+                <span className="font-sans text-[11px] text-gray-500">Receive a weekly email summary of student engagement and completion rates.</span>
+              </div>
+              <input
+                type="checkbox"
+                checked={settings.weeklyReport}
+                onChange={e => setSettings(s => ({ ...s, weeklyReport: e.target.checked }))}
+                className="w-4 h-4 text-[#0d5c63] rounded border-gray-300 focus:ring-[#0d5c63]"
+              />
+            </label>
+          </div>
+        )}
+
+        {/* Save Settings Action Button */}
+        <div className="pt-4 border-t border-gray-100 flex justify-end">
+          <button
+            onClick={() => showToast('Creator settings updated successfully!', 'success')}
+            className="px-6 py-2.5 bg-[#0d5c63] hover:bg-[#09474d] text-white font-sans text-xs font-bold rounded-xl shadow-xs transition-all flex items-center gap-2"
+          >
+            <span className="material-symbols-outlined text-[16px]">save</span> Save Settings
+          </button>
+        </div>
       </div>
     </div>
   );
@@ -300,97 +954,141 @@ const Admin = () => {
   const { user, logout, showToast } = useApp();
   const navigate = useNavigate();
   const courses = COURSE_CATALOGUE;
-  const [activeTab, setActiveTab] = useState('Overview');
+  const [activeTab, setActiveTab] = useState('Overview'); // Default to Overview
+  const [isEditingCourse, setIsEditingCourse] = useState(false);
 
   const handleLogout = () => {
     logout();
     navigate('/login');
   };
 
-  const tabs = ['Overview', 'Courses', 'Students'];
+  const navTabs = [
+    { id: 'Overview', icon: 'dashboard', label: 'Overview' },
+    { id: 'Courses', icon: 'collections_bookmark', label: 'Courses' },
+    { id: 'Students', icon: 'group', label: 'Students' },
+    { id: 'Analytics', icon: 'analytics', label: 'Analytics' },
+    { id: 'Settings', icon: 'settings', label: 'Settings' },
+  ];
 
   return (
-    <div className="bg-background text-on-background font-sans antialiased min-h-screen flex">
+    <div className="bg-[#f4f7f6] text-gray-900 font-sans antialiased min-h-screen flex">
 
       {/* Admin Sidebar */}
-      <nav className="bg-surface-container-highest text-primary font-sans text-sm hidden md:flex flex-col h-screen p-5 gap-3 w-64 shadow-md sticky top-0 shrink-0 z-50">
-        <div className="flex items-center gap-2 mb-4 px-2">
-          <div className="w-9 h-9 rounded-full bg-primary text-on-primary flex items-center justify-center font-bold text-sm shrink-0">
-            {user?.initials || 'AD'}
+      <aside className="bg-white text-gray-800 font-sans text-sm hidden md:flex flex-col h-screen p-5 gap-3 w-64 border-r border-gray-200/80 sticky top-0 shrink-0 z-50">
+        {/* Brand Header */}
+        <div className="flex items-center gap-2.5 px-2 mb-4">
+          <div className="w-8 h-8 rounded-full bg-[#0d5c63] text-white flex items-center justify-center font-bold text-sm shrink-0">
+            V
           </div>
-          <div>
-            <p className="font-sans text-sm font-bold text-on-surface">{user?.name || 'Admin'}</p>
-            <p className="font-sans text-xs text-on-surface-variant">Institutional Dashboard</p>
+          <span className="font-display text-base font-bold text-[#0d5c63] tracking-tight">Vetora Admin</span>
+        </div>
+
+        {/* User Profile Badge */}
+        <div className="flex items-center gap-3 mb-6 p-3 rounded-2xl bg-gray-50 border border-gray-200/70">
+          <img
+            src="https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=150&auto=format&fit=crop&q=80"
+            alt="Dr. Sarah Jenkins"
+            className="w-10 h-10 rounded-full object-cover shrink-0 border border-gray-200"
+          />
+          <div className="min-w-0">
+            <p className="font-sans text-xs font-bold text-gray-900 truncate">Dr. Sarah Jenkins</p>
+            <p className="font-sans text-[11px] text-gray-500 truncate font-medium">Institutional Dashboard</p>
           </div>
         </div>
 
-        <div className="flex flex-col gap-1 flex-1">
-          {tabs.map(tab => (
-            <button
-              key={tab}
-              onClick={() => setActiveTab(tab)}
-              className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all font-sans text-sm text-left
-                ${activeTab === tab ? 'bg-primary text-on-primary font-bold' : 'text-on-surface-variant hover:bg-surface-container-high'}`}
-            >
-              <span className="material-symbols-outlined text-[20px]" style={activeTab === tab ? { fontVariationSettings: "'FILL' 1" } : {}}>
-                {tab === 'Overview' ? 'dashboard' : tab === 'Courses' ? 'library_books' : 'group'}
-              </span>
-              {tab}
-            </button>
-          ))}
-        </div>
-
-        <div className="pt-4 border-t border-outline-variant/40 space-y-1">
-          <button onClick={() => navigate('/dashboard')} className="flex items-center gap-3 px-3 py-2.5 w-full text-on-surface-variant hover:bg-surface-container-high rounded-xl transition-all text-sm">
-            <span className="material-symbols-outlined">arrow_back</span> Student View
-          </button>
-          <button onClick={handleLogout} className="flex items-center gap-3 px-3 py-2.5 w-full text-error hover:bg-error-container/30 rounded-xl transition-all text-sm">
-            <span className="material-symbols-outlined">logout</span> Logout
-          </button>
-        </div>
-      </nav>
-
-      {/* Main content */}
-      <main className="flex-1 overflow-y-auto">
-        {/* Mobile top bar */}
-        <header className="md:hidden bg-surface border-b border-outline-variant p-4 flex items-center justify-between sticky top-0 z-40">
-          <h1 className="font-display text-xl font-bold text-primary">Vetora Admin</h1>
-          <div className="flex gap-1 overflow-x-auto">
-            {tabs.map(t => (
-              <button key={t} onClick={() => setActiveTab(t)}
-                className={`px-3 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap ${activeTab === t ? 'bg-primary text-on-primary' : 'text-on-surface-variant'}`}>
-                {t}
+        {/* Sidebar Navigation */}
+        <div className="flex flex-col gap-1.5 flex-1">
+          {navTabs.map(tab => {
+            const isActive = activeTab === tab.id;
+            return (
+              <button
+                key={tab.id}
+                onClick={() => {
+                  setActiveTab(tab.id);
+                  if (tab.id !== 'Courses') setIsEditingCourse(false);
+                }}
+                className={`flex items-center gap-3.5 px-4 py-2.5 rounded-xl transition-all font-sans text-sm text-left
+                  ${isActive
+                    ? 'bg-[#0d5c63] text-white font-bold shadow-xs'
+                    : 'text-gray-600 hover:bg-gray-100/80 hover:text-gray-900 font-medium'}`}
+              >
+                <span className="material-symbols-outlined text-[20px]" style={isActive ? { fontVariationSettings: "'FILL' 1" } : {}}>
+                  {tab.icon}
+                </span>
+                {tab.label}
               </button>
-            ))}
-          </div>
-        </header>
-
-        <div className="p-5 md:p-8 max-w-7xl mx-auto">
-          {/* Page title */}
-          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-6">
-            <div>
-              <h1 className="font-display text-2xl md:text-3xl font-bold text-on-surface">{activeTab}</h1>
-              <p className="font-sans text-sm text-on-surface-variant mt-0.5">
-                {activeTab === 'Overview' && 'Performance data across your institution.'}
-                {activeTab === 'Courses' && `${courses.length} courses in the catalogue.`}
-                {activeTab === 'Students' && `${STUDENTS.length} students enrolled.`}
-              </p>
-            </div>
-            <button
-              onClick={() => showToast('Report generation coming soon!', 'info')}
-              className="px-4 py-2.5 border border-primary text-primary rounded-xl font-sans text-sm hover:bg-primary-container transition-colors flex items-center gap-2 self-start sm:self-auto"
-            >
-              <span className="material-symbols-outlined text-[18px]">download</span> Export Report
-            </button>
-          </div>
-
-          {activeTab === 'Overview'  && <OverviewTab  courses={courses} showToast={showToast} />}
-          {activeTab === 'Courses'   && <CoursesTab   courses={courses} showToast={showToast} />}
-          {activeTab === 'Students'  && <StudentsTab  showToast={showToast} />}
+            );
+          })}
         </div>
+
+        {/* Bottom Actions */}
+        <div className="pt-4 border-t border-gray-200/70 space-y-1">
+          <button
+            onClick={() => navigate('/dashboard')}
+            className="flex items-center gap-3 px-3 py-2 w-full text-gray-600 hover:bg-gray-100 rounded-xl transition-all text-xs font-semibold"
+          >
+            <span className="material-symbols-outlined text-[18px]">arrow_back</span> Student View
+          </button>
+          <button
+            onClick={handleLogout}
+            className="flex items-center gap-3 px-3 py-2 w-full text-red-600 hover:bg-red-50 rounded-xl transition-all text-xs font-semibold"
+          >
+            <span className="material-symbols-outlined text-[18px]">logout</span> Logout
+          </button>
+        </div>
+      </aside>
+
+      {/* Main Content Area */}
+      <main className="flex-1 overflow-y-auto">
+        {/* Render Course Creator View when active */}
+        {activeTab === 'Courses' && isEditingCourse ? (
+          <CourseCreator
+            showToast={showToast}
+            onBack={() => setIsEditingCourse(false)}
+          />
+        ) : (
+          <div className="p-5 md:p-8 max-w-7xl mx-auto">
+            {/* Page title */}
+            <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-6">
+              <div>
+                <h1 className="font-display text-2xl md:text-3xl font-bold text-gray-900">{activeTab}</h1>
+                <p className="font-sans text-xs text-gray-500 mt-1">
+                  {activeTab === 'Overview' && 'Performance data across your institution.'}
+                  {activeTab === 'Courses' && `${courses.length} courses in the catalogue.`}
+                  {activeTab === 'Students' && `${STUDENTS.length} students enrolled.`}
+                  {activeTab === 'Analytics' && 'Student engagement, watch time, and retention metrics.'}
+                  {activeTab === 'Settings' && 'Manage instructor details and curriculum configuration.'}
+                </p>
+              </div>
+
+              {activeTab === 'Courses' && (
+                <button
+                  onClick={() => setIsEditingCourse(true)}
+                  className="px-4 py-2 bg-[#0d5c63] text-white rounded-xl font-sans text-xs font-bold hover:bg-[#09474d] transition-colors flex items-center gap-1 shadow-xs"
+                >
+                  <span className="material-symbols-outlined text-[16px]">edit</span> Open Course Creator
+                </button>
+              )}
+            </div>
+
+            {activeTab === 'Overview' && <OverviewTab showToast={showToast} />}
+            {activeTab === 'Courses' && (
+              <CoursesTab
+                courses={courses}
+                showToast={showToast}
+                onEditCourse={() => setIsEditingCourse(true)}
+              />
+            )}
+            {activeTab === 'Students' && <StudentsTab showToast={showToast} />}
+            {activeTab === 'Analytics' && <AnalyticsTab showToast={showToast} />}
+            {activeTab === 'Settings' && <SettingsTab showToast={showToast} />}
+          </div>
+        )}
       </main>
     </div>
   );
 };
 
 export default Admin;
+
+
